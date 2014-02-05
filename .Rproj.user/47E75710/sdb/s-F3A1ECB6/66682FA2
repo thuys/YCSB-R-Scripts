@@ -1,0 +1,22 @@
+{
+    "contents" : "",
+    "created" : 1389889659463.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "66682FA2",
+    "lastKnownWriteTime" : 13229740524830817,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "caption" : "rawData",
+        "contentUrl" : "content?title=rawData&file=6ba865e845964400817590671056bdd6.htm",
+        "displayedObservations" : "5",
+        "displayedVariables" : 5,
+        "totalObservations" : "5",
+        "variables" : "4"
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}
