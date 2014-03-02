@@ -174,7 +174,7 @@ plotMultipleLoadMultipleLabels = function(datas, types, labels, title, minX, max
   
 }
 
-plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, exportDir){
+plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, exportDir){
   # Collect by possibleActions on "AverageLatency(us)" in ms
   data <- list();
   globalDatas <- list();
@@ -185,24 +185,24 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
   
   minY <- 0
   maxY <- NA
-  for(dbs in 1:length(files)){
+  for(dbs in 1:length(nbOfRequests)){
     data[[dbs]] <- list();
-    globalDatas[[dbs]] <- matrix(nrow = length(files[[dbs]]), ncol = length(possibleActions))
-    averageLatency[[dbs]] <- matrix(nrow=length(files[[dbs]]), ncol=1);
-    rownames(averageLatency[[dbs]]) <- nbOfThreads[[dbs]]
+    globalDatas[[dbs]] <- matrix(nrow = length(nbOfRequests[[dbs]]), ncol = length(possibleActions))
+    averageLatency[[dbs]] <- matrix(nrow=length(nbOfRequests[[dbs]]), ncol=1);
+    rownames(averageLatency[[dbs]]) <- nbOfRequests[[dbs]]
     
     colnames(globalDatas[[dbs]]) <- possibleActions
-    rownames(globalDatas[[dbs]]) <- nbOfThreads[[dbs]]
-    for(runOfDBs in 1:length(files[[dbs]])){
-      returnValue = parseInput(files[[dbs]][runOfDBs], timeFrame)
+    rownames(globalDatas[[dbs]]) <- nbOfRequests[[dbs]]
+    for(runOfDBs in 1:length(nbOfRequests[[dbs]])){
+      returnValue = parseInput(sub("%1", nbOfRequests[[dbs]][runOfDBs], files[[dbs]]), timeFrame)
       
       data[[dbs]][[runOfDBs]] <- returnValue
       globalDatas[[dbs]][runOfDBs, ] <- t(returnValue$global[, "AverageLatency(us)"])
       averageLatency[[dbs]][runOfDBs, 1] = returnValue$throughPut
     }
     
-    minX = min(min(nbOfThreads[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
-    maxX = max(max(nbOfThreads[[dbs]], na.rm = TRUE), maxX, na.rm = TRUE)
+    minX = min(min(nbOfRequests[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
+    maxX = max(max(nbOfRequests[[dbs]], na.rm = TRUE), maxX, na.rm = TRUE)
     
     minY = min(min(globalDatas[[dbs]], na.rm = TRUE), minY, na.rm = TRUE)
     maxY = max(max(globalDatas[[dbs]], na.rm = TRUE), maxY, na.rm = TRUE)
@@ -221,8 +221,8 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
     for(dbs in 1:length(files)){
       minY = min(min(globalDatas[[dbs]][,label], na.rm = TRUE), minY, na.rm = TRUE)
       maxY = max(max(globalDatas[[dbs]][,label], na.rm = TRUE), maxY, na.rm = TRUE)
-      minX = min(min(nbOfThreads[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
-      maxX = max(max(nbOfThreads[[dbs]], na.rm = TRUE), maxX, na.rm = TRUE)
+      minX = min(min(nbOfRequests[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
+      maxX = max(max(nbOfRequests[[dbs]], na.rm = TRUE), maxX, na.rm = TRUE)
     }
     png(filename=paste(exportDir, "/loadbalance-label-",label, ".png", sep=""))
     plotMultipleLoadSingleLabel(globalDatas, label, dbNames, paste("Plot of", label), minX, maxX, minY, maxY)
@@ -233,8 +233,8 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
     minY <- 0
     maxY <- NA
     
-    minX <- min(nbOfThreads[[dbs]], na.rm = TRUE)
-    maxX <- max(nbOfThreads[[dbs]], na.rm = TRUE)
+    minX <- min(nbOfRequests[[dbs]], na.rm = TRUE)
+    maxX <- max(nbOfRequests[[dbs]], na.rm = TRUE)
     
     for(label in labels){
       minY = min(min(globalDatas[[dbs]][,label], na.rm = TRUE), minY, na.rm = TRUE)
@@ -269,22 +269,15 @@ plotAll(c("example_code.txt", "example_code2.txt"), c("file-1", "file-2"), c(200
         c("UPDATE", "READ"), ".")
 
 files <- list()
-nbOfThreads <- list()
+nbOfRequests <- list()
 timeFrame <- 1000
 
-files[[1]] <- c(
-  paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-1.dat"), 
-  paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-2.dat"), 
-  paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-3.dat")
-)
+files[[1]] <- paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-%1.dat")
 
-nbOfThreads[[1]] <- c(9,10,11)
+nbOfRequests[[1]] <- c(1,2,3)
 
-files[[2]] <- c(
-  paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-1.dat"), 
-  paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-2.dat")
-)
+files[[2]] <- paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-%1.dat")
 
-nbOfThreads[[2]] <- c(9,10)
-test <- plotLoadTesting(files, c("MongoDB", "PostgreSQL"), nbOfThreads, 
+nbOfRequests[[2]] <- c(1,2)
+test <- plotLoadTesting(files, c("MongoDB", "PostgreSQL"), nbOfRequests, 
                 timeFrame, c("UPDATE", "READ"), ".")
