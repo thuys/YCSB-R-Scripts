@@ -1,0 +1,17 @@
+{
+    "contents" : "# x: the vector\n# n: the number of samples\n# centered: if FALSE, then average current sample and previous (n-1) samples\n#           if TRUE, then average symmetrically in past and future. (If n is even, use one more sample from future.)\nmovingAverage <- function(x, n=1, centered=FALSE) {\n  filter(x,rep(1/n,n), sides=1)\n}",
+    "created" : 1392740125411.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4109068043",
+    "id" : "2145CA8B",
+    "lastKnownWriteTime" : 1393587968,
+    "path" : "~/Schooljaar 2013-2014/Thesis/R/includes.R",
+    "project_path" : "includes.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : true,
+    "type" : "r_source"
+}

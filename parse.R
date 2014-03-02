@@ -1,7 +1,10 @@
 assign("sToRemove", 10, envir = .GlobalEnv)
 assign("movingAverageFrame", 20, envir = .GlobalEnv)
 assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP"), envir = .GlobalEnv)
-assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0"), envir = .GlobalEnv)
+assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0", "Return=-1"), envir = .GlobalEnv)
+assign("figureWidth", 1024, envir = .GlobalEnv)
+assign("figureHeight", 512, envir = .GlobalEnv)
+assign("figureRes", 300, envir = .GlobalEnv)
 library(ggplot2) 
 parseInput <- function(fileName, timeFrame){
   
@@ -12,7 +15,9 @@ parseInput <- function(fileName, timeFrame){
   
   #Runtime
   runTimeLine=grep("[OVERALL], RunTime(ms),", k, fixed=TRUE)
-  runTime = as.numeric(lineS[[runTimeLine]][3])
+  tryCatch({
+    runTime = as.numeric(lineS[[runTimeLine]][3])
+  },error = function(e) print(paste("Problem in file ", fileName)))
   # Throughput
   throughPutLine = grep("[OVERALL], Throughput(ops/sec)", k, fixed=TRUE)
   throughPut = as.numeric(lineS[[throughPutLine]][3])
@@ -36,7 +41,7 @@ parseInput <- function(fileName, timeFrame){
       
       typeOfTag <- match(tag, globalElements)
       if(is.na(typeOfTag)){
-        if(as.numeric(tag)/timeFrame+1<floor(runTime/timeFrame)){
+        if(!is.na(as.numeric(tag)) && as.numeric(tag)/timeFrame+1<floor(runTime/timeFrame)){
           rawData[(as.numeric(tag)/timeFrame+1), action] <- value/1000
         }
         #rawData[(as.numeric(tag)/timeFrame+1), action] <- value
@@ -49,7 +54,7 @@ parseInput <- function(fileName, timeFrame){
   return(list(raw = rawData, global =globalMatrix, runTime = runTime, throughPut = throughPut))
 }
 
-plotSingleData = function(data, labels, title, minX, maxX, minY, maxY){
+plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
   plot(x = 0, y = 0, type="n", main=heading, xlab ="Time(s)",ylab = "Latency(ms)",
@@ -57,23 +62,31 @@ plotSingleData = function(data, labels, title, minX, maxX, minY, maxY){
   colNb <- 0
   for(label in labels){
     colNb <- colNb +1
-    lines(x = rownames(data), y = data[,label], type="p",col = colNb, pch = colNb) 
-    lines(x = rownames(data), y = movingAverage(data[,label],10), type="l",col = colNb, pch = colNb, lwd=2) 
+    if(showPoints){
+      lines(x = rownames(data), y = data[,label], type="p",col = colNb, pch = colNb) 
+    }
+    if(showAverage){
+      lines(x = rownames(data), y = movingAverage(data[,label],10), type="l",col = colNb, pch = colNb, lwd=2) 
+    }
     
   }
   legend("topright", labels, col = 1:colNb, pch = 1:colNb)
   
 }
 
-plotMultipleDataSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY){
+plotMultipleDataSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
   plot(x = 0, y = 0, type="n", main=heading, xlab ="Time(s)",ylab = "Latency(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
 
   for(index in 1:length(datas)){
-    lines(x = rownames(datas[[index]]), y = datas[[index]][,type], type="p",col = index, pch = index) 
-    lines(x = rownames(datas[[index]]), y = movingAverage(datas[[index]][,type],movingAverageFrame), type="l",col = index, pch = index, lwd=2) 
+    if(showPoints){
+      lines(x = rownames(datas[[index]]), y = datas[[index]][,type], type="p",col = index, pch = index) 
+    }
+    if(showAverage){
+      lines(x = rownames(datas[[index]]), y = movingAverage(datas[[index]][,type],movingAverageFrame), type="l",col = index, pch = index, lwd=2) 
+    }
   }
   legend("topright", labels, col = 1:length(datas), pch = 1:length(datas))
   
@@ -90,7 +103,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
     minY = 0
     #minY = min(rawData[[i]][, labels], na.rm = TRUE)
     maxY = max(rawData[[i]][(sToRemove*timeFrames[i]/1000):nrow(rawData[[i]]), labels], na.rm = TRUE)
-    png(filename=paste(exportDir, "/single-graph",fileNames[i], ".png", sep=""))
+    png(filename=paste(exportDir, "/single-graph",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
     plotSingleData(rawData[[i]], labels, 
                    paste("Plot of", fileNames[i])
                    , sToRemove, data[[i]]$runTime/1000, minY, maxY)
@@ -107,7 +120,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
       maxX = max(minY, data[[i]]$runTime/1000, na.rm = TRUE)
     }
 
-    png(filename=paste(exportDir, "/multiple-graph",label, ".png", sep=""))
+    png(filename=paste(exportDir, "/multiple-graph",label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
     plotMultipleDataSingleLabel(rawData, label, fileNames, 
                    paste("Plot of", label)
                    , sToRemove, maxX, minY, maxY)
@@ -118,7 +131,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
 plotSingleLoadMultipleLabels = function(data, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of threads",ylab = "Average Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   for(index in 1:length(labels)){
@@ -132,7 +145,7 @@ plotSingleLoadMultipleLabels = function(data, labels, title, minX, maxX, minY, m
 plotMultipleLoadSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of threads",ylab = "Average Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   for(index in 1:length(datas)){
@@ -145,7 +158,7 @@ plotMultipleLoadSingleLabel = function(datas, type, labels, title, minX, maxX, m
 plotMultipleLoadMultipleLabels = function(datas, types, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests",ylab = "Average Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   legende = c(1:(length(types)*length(datas)))
@@ -189,7 +202,7 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrames, labels, expo
     maxY = max(max(globalDatas[[dbs]], na.rm = TRUE), maxY, na.rm = TRUE)
   }
   
-  png(filename=paste(exportDir, "/loadbalance-all", ".png", sep=""))
+  png(filename=paste(exportDir, "/loadbalance-all", ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
   plotMultipleLoadMultipleLabels(globalDatas, labels, dbNames, "Load plot", minX, maxX, minY, maxY)
   dev.off(); 
   
@@ -221,7 +234,7 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrames, labels, expo
       minY = min(min(globalDatas[[dbs]][,label], na.rm = TRUE), minY, na.rm = TRUE)
       maxY = max(max(globalDatas[[dbs]][,label], na.rm = TRUE), maxY, na.rm = TRUE)
     }
-    png(filename=paste(exportDir, "/loadbalance-db", dbNames[[dbs]], ".png", sep=""))
+    png(filename=paste(exportDir, "/loadbalance-db", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
     plotSingleLoadMultipleLabels(globalDatas[[dbs]], labels, paste("Plot for", dbNames[[dbs]]), minX, maxX, minY, maxY)
     dev.off(); 
   }
