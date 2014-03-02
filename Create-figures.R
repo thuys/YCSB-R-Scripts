@@ -53,7 +53,7 @@ for(node in 2:3){
 }
 
 files <- list()
-nbOfThreads <- list()
+nbOfThread <- 1000
 timeFrames <- list()
 
 files[[1]] <- c(
@@ -65,7 +65,6 @@ files[[1]] <- c(
   paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/threads-5000-2.dat"),
   paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/threads-10000-2.dat")
 )
-timeFrames[[1]] <- c(1000,1000, 1000, 1000, 1000, 1000, 1000)
 nbOfThreads[[1]] <- c(100, 200, 500, 1000, 2000, 5000, 10000)
 
 files[[2]] <- c(
@@ -75,7 +74,6 @@ files[[2]] <- c(
   paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/threads-100-2.dat"), 
   paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/threads-200-2.dat")
 )
-timeFrames[[2]] <- c(1000,1000, 1000, 1000, 1000)
 nbOfThreads[[2]] <- c(10,20,50,100,200)
 
 files[[3]] <- c(
@@ -87,61 +85,8 @@ files[[3]] <- c(
   paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/threads-5000-2.dat"), 
   paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/threads-10000-2.dat")
 )
-timeFrames[[3]] <- c(1000,1000, 1000, 1000, 1000, 1000, 1000)
 nbOfThreads[[3]] <- c(100,200,500,1000,2000,5000,10000)
 test <- tryCatch({
  plotLoadTesting(files, c("MongoDB", "PostgreSQL", "HBase"), nbOfThreads, 
-                        timeFrames, c("UPDATE", "READ"), "D:/Schooljaar 2013-2014/Thesis/Results/")
+                        1000, c("UPDATE", "READ"), "D:/Schooljaar 2013-2014/Thesis/Results/")
 }, error = function(e) print(paste("Problem in all graph", e)))
-
-
-
-for(run in 3:3){
-  tryCatch({
-    plotAll(
-      c(
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/continious-1-",run,".dat", sep=""), 
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/continious-2-",run,".dat", sep=""), 
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/continious-3-",run,".dat", sep="")
-      ), 
-      c("Node 1", "Node 2", "Node 3"), 
-      c(1000, 1000,1000), 
-      c("UPDATE", "READ"), 
-      paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/Fig/Continious-Run-", run, sep="")
-    )
-  },error = function(e) print(paste("Problem in mongoDB continious run", run, e))
-  )
-  }
-
-for(run in 3:3){
-  tryCatch({
-    plotAll(
-      c(
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/continious-2-",run,".dat", sep=""), 
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/continious-3-",run,".dat", sep=""), 
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/continious-5-",run,".dat", sep="")
-      ), 
-      c("Node 1", "Node 2", "Node 3"), 
-      c(1000, 1000,1000), 
-      c("UPDATE", "READ"), 
-      paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/Fig/Continious-Run-", run, sep="")
-    )
-  },error = function(e) print(paste("Problem in hbase continious run", run, e))
-  )
-}
-
-for(run in 3:3){
-  tryCatch({
-    plotAll(
-      c(
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/continious-1-",run,".dat", sep=""), 
-        paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/continious-2-",run,".dat", sep="")
-      ), 
-      c("Node 1", "Node 2"), 
-      c(1000, 1000), 
-      c("UPDATE", "READ"), 
-      paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/Fig/Continious-Run-", run, sep="")
-    )
-  },error = function(e) print(paste("Problem in postgresql continious run", run, e))
-  )
-}

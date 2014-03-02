@@ -1,0 +1,58 @@
+
+for(run in 3:3){
+  tryCatch({
+    plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/continious-%1.dat",
+                       c(
+                         paste("1-",run,sep=""), 
+                         paste("2-",run,sep="")
+                       ), 
+                       c("Node 1", "Node 2"), 
+                       1000, 
+                       c("UPDATE", "READ"), 
+                       paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/Fig/Continious-Run-", run, sep=""), 
+                       c(301,601), 
+                       c("All online", "Shut down", "One offline", "Power on", "All online")
+    )
+  },error = function(e) print(paste("Problem in postgresql continious run", run, e))
+  )
+}
+
+for(run in 3:3){
+  tryCatch({
+    plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/hbase/continious-%1.dat",
+                       c(
+                         paste("2-",run,sep=""), 
+                         paste("3-",run,sep=""),
+                         paste("5-",run,sep="")
+                       ), 
+                       c("Node 2", "Node 3", "Node 5"), 
+                       1000, 
+                       c("UPDATE", "READ"), 
+                       paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/Fig/Continious-Run-", run, sep=""), 
+                       c(301,601), 
+                       c("All online", "Shut down", "One offline", "Power on", "All online")
+                       
+    )
+  },error = function(e) print(paste("Problem in hbase continious run", run, e))
+  )
+}
+
+for(run in 3:3){
+  tryCatch({
+    plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/continious-%1.dat",
+                       c(
+                         paste("1-",run,sep=""), 
+                         paste("2-",run,sep=""),
+                         paste("3-",run,sep="")
+                       ), 
+                       c("Node 1", "Node 2", "Node 3"), 
+                       1000, 
+                       c("UPDATE", "READ"), 
+                       paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/Fig/Continious-Run-", run, sep=""), 
+                       c(301,601), 
+                       c("All online", "Shut down", "One offline", "Power on", "All online")
+                       
+    )
+  },error = function(e) print(paste("Problem in mongodb continious run", run, e))
+  )
+}

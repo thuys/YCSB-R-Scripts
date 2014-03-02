@@ -174,7 +174,7 @@ plotMultipleLoadMultipleLabels = function(datas, types, labels, title, minX, max
   
 }
 
-plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrames, labels, exportDir){
+plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, exportDir){
   # Collect by possibleActions on "AverageLatency(us)" in ms
   data <- list();
   globalDatas <- list();
@@ -189,7 +189,7 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrames, labels, expo
     colnames(globalDatas[[dbs]]) <- possibleActions
     rownames(globalDatas[[dbs]]) <- nbOfThreads[[dbs]]
     for(runOfDBs in 1:length(files[[dbs]])){
-      returnValue = parseInput(files[[dbs]][runOfDBs], timeFrames[[dbs]][runOfDBs])
+      returnValue = parseInput(files[[dbs]][runOfDBs], timeFrame)
       
       data[[dbs]][[runOfDBs]] <- returnValue
       globalDatas[[dbs]][runOfDBs, ] <- t(returnValue$global[, "AverageLatency(us)"])
@@ -257,7 +257,7 @@ plotAll(c("example_code.txt", "example_code2.txt"), c("file-1", "file-2"), c(200
 
 files <- list()
 nbOfThreads <- list()
-timeFrames <- list()
+timeFrame <- 1000
 
 files[[1]] <- c(
   paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-1.dat"), 
@@ -265,7 +265,6 @@ files[[1]] <- c(
   paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-3.dat")
 )
 
-timeFrames[[1]] <- c(1000,1000, 1000)
 nbOfThreads[[1]] <- c(9,10,11)
 
 files[[2]] <- c(
@@ -273,7 +272,6 @@ files[[2]] <- c(
   paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-2.dat")
 )
 
-timeFrames[[2]] <- c(1000,1000)
 nbOfThreads[[2]] <- c(9,10)
 test <- plotLoadTesting(files, c("MongoDB", "PostgreSQL"), nbOfThreads, 
-                timeFrames, c("UPDATE", "READ"), ".")
+                timeFrame, c("UPDATE", "READ"), ".")
