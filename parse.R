@@ -178,6 +178,8 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
   # Collect by possibleActions on "AverageLatency(us)" in ms
   data <- list();
   globalDatas <- list();
+  averageLatency <- list();
+  
   minX <- NA
   maxX <- NA
   
@@ -186,6 +188,9 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
   for(dbs in 1:length(files)){
     data[[dbs]] <- list();
     globalDatas[[dbs]] <- matrix(nrow = length(files[[dbs]]), ncol = length(possibleActions))
+    averageLatency[[dbs]] <- matrix(nrow=length(files[[dbs]]), ncol=1);
+    rownames(averageLatency[[dbs]]) <- nbOfThreads[[dbs]]
+    
     colnames(globalDatas[[dbs]]) <- possibleActions
     rownames(globalDatas[[dbs]]) <- nbOfThreads[[dbs]]
     for(runOfDBs in 1:length(files[[dbs]])){
@@ -193,6 +198,7 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
       
       data[[dbs]][[runOfDBs]] <- returnValue
       globalDatas[[dbs]][runOfDBs, ] <- t(returnValue$global[, "AverageLatency(us)"])
+      averageLatency[[dbs]][runOfDBs, 1] = returnValue$throughPut
     }
     
     minX = min(min(nbOfThreads[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
@@ -218,7 +224,7 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
       minX = min(min(nbOfThreads[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
       maxX = max(max(nbOfThreads[[dbs]], na.rm = TRUE), maxX, na.rm = TRUE)
     }
-    png(filename=paste(exportDir, "/loadbalance-label",label, ".png", sep=""))
+    png(filename=paste(exportDir, "/loadbalance-label-",label, ".png", sep=""))
     plotMultipleLoadSingleLabel(globalDatas, label, dbNames, paste("Plot of", label), minX, maxX, minY, maxY)
     dev.off(); 
   }
@@ -234,8 +240,15 @@ plotLoadTesting = function(files, dbNames, nbOfThreads, timeFrame, labels, expor
       minY = min(min(globalDatas[[dbs]][,label], na.rm = TRUE), minY, na.rm = TRUE)
       maxY = max(max(globalDatas[[dbs]][,label], na.rm = TRUE), maxY, na.rm = TRUE)
     }
-    png(filename=paste(exportDir, "/loadbalance-db", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    png(filename=paste(exportDir, "/loadbalance-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
     plotSingleLoadMultipleLabels(globalDatas[[dbs]], labels, paste("Plot for", dbNames[[dbs]]), minX, maxX, minY, maxY)
+    dev.off(); 
+    
+    png(filename=paste(exportDir, "/loadbalance-realthroughput-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    plot(x = rownames(averageLatency[[dbs]]), y = (averageLatency[[dbs]]/as.numeric(rownames(averageLatency[[dbs]]))),
+         type="b", main=paste("Requested vs real requests for", dbNames[[dbs]]), 
+         xlab ="Requested nb of requests/s",ylab = "Real nb of requests/s / Requested nb of requests/s",  
+         xlim = c(minX, maxX), ylim=c(0,1))
     dev.off(); 
   }
   
