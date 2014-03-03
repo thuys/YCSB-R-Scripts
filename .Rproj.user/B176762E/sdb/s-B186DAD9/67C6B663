@@ -1,0 +1,17 @@
+{
+    "contents" : "for(node in 1:3){\n  for(run in 1:3){\n    tryCatch({\n      plotAll(\n        c(\n          paste(\"D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-\",run,\".dat\", sep=\"\"), \n          paste(\"D:/Schooljaar 2013-2014/Thesis/Results/mongodb/one-down-\",node, \"-\", run,\".dat\", sep=\"\")\n        ), \n        c(\"All Online\", \"One offline\"), \n        c(1000, 1000), \n        c(\"UPDATE\", \"READ\"), \n        paste(\"D:/Schooljaar 2013-2014/Thesis/Results/mongodb/Fig/Node-\", node, \"/Run-\", run, sep=\"\")\n      )\n    },error = function(e) print(paste(\"Problem in mongoDB node\", node, \"run\", run, e))\n    )\n  }\n}\n\n\n\nfor(node in 1:2){\n  for(run in 1:2){\n    tryCatch({\n      plotAll(\n        c(\n          paste(\"D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-\",run,\".dat\", sep=\"\"), \n          paste(\"D:/Schooljaar 2013-2014/Thesis/Results/postgresql/one-postgres-down-\",node, \"-\", run,\".dat\", sep=\"\")\n        ), \n        c(\"All Online\", \"One postgres offline\"), \n        c(1000, 1000), \n        c(\"UPDATE\", \"READ\"), \n        paste(\"D:/Schooljaar 2013-2014/Thesis/Results/postgresql/Fig/Node-\", node, \"/Run-\", run, sep=\"\")\n      )\n    },error = function(e) print(paste(\"Problem in Postgresql node\", node, \"run\", run, e)))\n  }\n}\n\nfor(node in 2:3){\n  for(run in 1:3){\n    tryCatch({\n    plotAll(\n      c(\n        paste(\"D:/Schooljaar 2013-2014/Thesis/Results/hbase/all-\",run,\".dat\", sep=\"\"), \n        paste(\"D:/Schooljaar 2013-2014/Thesis/Results/hbase/one-region-down-\",(node), \"-\", run,\".dat\", sep=\"\")\n        #paste(\"D:/Schooljaar 2013-2014/Thesis/Results/hbase/one-master-down-\",(node), \"-\", run,\".dat\", sep=\"\")\n      ), \n      c(\"All Online\", \"One region offline\"),#, \"One master offline\"), \n      c(1000, 1000),#, 1000), \n      c(\"UPDATE\", \"READ\"), \n      paste(\"D:/Schooljaar 2013-2014/Thesis/Results/hbase/Fig/Node-\", (node), \"/Run-\", run, sep=\"\")\n    )},error = function(e) print(paste(\"Problem in HBase node\", node, \"run\", run, e)))\n  }\n}",
+    "created" : 1392743163440.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2412529876",
+    "id" : "67C6B663",
+    "lastKnownWriteTime" : 1393780313,
+    "path" : "~/Schooljaar 2013-2014/Thesis/R/Create-figures.R",
+    "project_path" : "Create-figures.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : true,
+    "type" : "r_source"
+}

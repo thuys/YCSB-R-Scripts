@@ -1,7 +1,7 @@
-assign("safetyMarginBeforeInterruptBefore", 10, envir = .GlobalEnv)
+assign("safetyMarginBeforeInterruptBefore", 30, envir = .GlobalEnv)
 assign("safetyMarginBeforeInterruptAfter", 30, envir = .GlobalEnv)
 
-assign("marginBeforeInterrupt", 10, envir = .GlobalEnv)
+assign("marginBeforeInterrupt", 30, envir = .GlobalEnv)
 assign("marginAfterInterrupt", 60, envir = .GlobalEnv)
 
 plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels, plotDir, interruptPoints, interruptLabels){
@@ -17,9 +17,12 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
     maxY = max(rawData[[i]][(sToRemove*timeFrame/1000):nrow(rawData[[i]]), labels], na.rm = TRUE)
     
     png(filename=paste(plotDir, "/single-graph-",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
-    plotSingleData(rawData[[i]], labels, 
+    plotSingleData(rawData[[i]][1:(nrow(rawData[[i]])-safetyMarginBeforeInterruptBefore),], labels, 
                    paste("Plot of", plotNames[i])
                    , sToRemove, data[[i]]$runTime/1000, minY, 1.5*maxY)
+    for(interruptPoint in interruptPoints){
+      abline(v = interruptPoint, col = "blue", lwd=4)
+    }
     dev.off(); 
     
     interruptedData <- list()
@@ -65,6 +68,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       plotMultipleDataSingleLabel(interruptedData, label, interruptedPlotNames, 
                                   paste("Plot of", label, "for", plotNames[i], "between interrupt moments.")
                                   , sToRemove, maxX, minY, 1.5*maxY)
+      
       dev.off(); 
     }
 
@@ -101,6 +105,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
     plotMultipleDataSingleLabel(interruptedData, label, interruptedPlotNames, 
                                 paste("Plot of", label, "for", plotNames[i], "on interrupt moments")
                                 , sToRemove, maxX, minY, 1.5*maxY)
+    abline(v = marginBeforeInterrupt, col = "blue", lwd=4)
     dev.off(); 
   }
   
