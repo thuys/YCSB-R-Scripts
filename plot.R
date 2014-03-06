@@ -21,7 +21,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
                    paste("Plot of", plotNames[i])
                    , sToRemove, data[[i]]$runTime/1000, minY, 1.5*maxY)
     for(interruptPoint in interruptPoints){
-      abline(v = interruptPoint, col = "blue", lwd=4)
+      abline(v = interruptPoint, col = "blue")
     }
     dev.off(); 
     
@@ -71,44 +71,33 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       
       dev.off(); 
     }
-
-
   
-  ## Now around an interrupt point
-  interruptedData <- list()
-  interruptedPlotNames <- c();
-  minX = 1
-  maxX = NA
-  for(interruptIndex in 1:length(interruptPoints)){
-    record <- interruptPoints[interruptIndex]
-    startIndex <- record - marginBeforeInterrupt
+  
     
-    endIndex <- record + marginAfterInterrupt 
+    ## Now around an interrupt point
+    interruptedData <- list()
     
-    interruptedData[[interruptIndex]] <- rawData[[i]][startIndex:endIndex,]
-    nbOfElements <- endIndex-startIndex
-    maxX = max(nbOfElements, maxX, na.rm = TRUE)
-    interruptedPlotNames[interruptIndex] <- paste(interruptLabels[2*(interruptIndex)], "(", startIndex, "->", endIndex, ")")
-    rownames(interruptedData[[interruptIndex]]) <- seq(0, nbOfElements*timeFrame/1000, timeFrame/1000)
-    
-    
-  }
-    
-  for(label in labels){
-    minY = 0
-    maxY = NA
-    
-    for(maxIndex in 1:length(interruptedData)){
-      maxY = max(maxY, max(interruptedData[[maxIndex]][(sToRemove*timeFrame/1000):nrow(interruptedData[[maxIndex]]), label], na.rm = TRUE), na.rm = TRUE)
+    for(interruptIndex in 1:length(interruptPoints)){
+      record <- interruptPoints[interruptIndex]
+      startIndex <- record - marginBeforeInterrupt
+      
+      endIndex <- record + marginAfterInterrupt 
+      
+      interruptedData[[interruptIndex]] <- rawData[[i]][startIndex:endIndex,]
+      nbOfElements <- endIndex-startIndex
+      minY = 0;
+      maxY = NA;
+      for(label in labels){
+          maxY = max(maxY, max(interruptedData[[interruptIndex]][,label], na.rm = TRUE), na.rm = TRUE)
+      }
+      png(filename=paste(plotDir, "/multiple-graph-interrupt-", plotNames[i], "-", interruptLabels[2*(interruptIndex)], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+      plotSingleData(interruptedData[[interruptIndex]], labels, 
+                     paste("Plot of", plotNames[i], "on", interruptLabels[2*(interruptIndex)])
+                     , startIndex, endIndex, minY, 1.1*maxY)
+      abline(v = record, col = "blue")
+      dev.off(); 
+      
     }
-    png(filename=paste(plotDir, "/multiple-graph-interrupt-", plotNames[i], "-" ,label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
-    plotMultipleDataSingleLabel(interruptedData, label, interruptedPlotNames, 
-                                paste("Plot of", label, "for", plotNames[i], "on interrupt moments")
-                                , sToRemove, maxX, minY, 1.5*maxY)
-    abline(v = marginBeforeInterrupt, col = "blue", lwd=4)
-    dev.off(); 
-  }
-  
   }
 }
 

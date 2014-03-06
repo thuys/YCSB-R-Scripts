@@ -29,7 +29,7 @@ for(run in c(1,3)){
                        1000, 
                        c("UPDATE", "READ"), 
                        paste("D:/Schooljaar 2013-2014/Thesis/Results-2/hbase/Fig/Continious-Run-", run, sep=""), 
-                       c(336,653),  
+                       c(333,653),  
                        c("All online", "Shut down", "One offline", "Power on", "All online")
                        
     )
