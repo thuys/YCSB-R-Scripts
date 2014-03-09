@@ -1,6 +1,6 @@
 assign("sToRemove", 10, envir = .GlobalEnv)
 assign("movingAverageFrame", 20, envir = .GlobalEnv)
-assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP"), envir = .GlobalEnv)
+assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP", "SCAN"), envir = .GlobalEnv)
 assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0", "Return=-1"), envir = .GlobalEnv)
 assign("figureWidth", 1024, envir = .GlobalEnv)
 assign("figureHeight", 512, envir = .GlobalEnv)

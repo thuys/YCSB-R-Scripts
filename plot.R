@@ -14,7 +14,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
     
     minY = 0
     #minY = min(rawData[[i]][, labels], na.rm = TRUE)
-    maxY = max(rawData[[i]][(sToRemove*timeFrame/1000):nrow(rawData[[i]]), labels], na.rm = TRUE)
+    maxY = max(movingAverage(rawData[[i]][(sToRemove*timeFrame/1000):nrow(rawData[[i]]), labels], movingAverageFrame), na.rm = TRUE)
     
     png(filename=paste(plotDir, "/single-graph-",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
     plotSingleData(rawData[[i]][1:(nrow(rawData[[i]])-safetyMarginBeforeInterruptBefore),], labels, 
@@ -62,7 +62,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       maxY = NA
 
       for(maxIndex in 1:length(interruptedData)){
-        maxY = max(maxY, max(interruptedData[[maxIndex]][(sToRemove*timeFrame/1000):nrow(interruptedData[[maxIndex]]), label], na.rm = TRUE), na.rm = TRUE)
+        maxY = max(maxY, max(movingAverage(interruptedData[[maxIndex]][(sToRemove*timeFrame/1000):nrow(interruptedData[[maxIndex]]), label], movingAverageFrame), na.rm = TRUE), na.rm = TRUE)
       }
       png(filename=paste(plotDir, "/multiple-graph-", plotNames[i], "-" ,label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
       plotMultipleDataSingleLabel(interruptedData, label, interruptedPlotNames, 
@@ -93,7 +93,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       png(filename=paste(plotDir, "/multiple-graph-interrupt-", plotNames[i], "-", interruptLabels[2*(interruptIndex)], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
       plotSingleData(interruptedData[[interruptIndex]], labels, 
                      paste("Plot of", plotNames[i], "on", interruptLabels[2*(interruptIndex)])
-                     , startIndex, endIndex, minY, 1.1*maxY)
+                     , startIndex, endIndex, minY, 1.5*maxY)
       abline(v = record, col = "blue")
       dev.off(); 
       
