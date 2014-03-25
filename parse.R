@@ -2,6 +2,8 @@ assign("sToRemove", 10, envir = .GlobalEnv)
 assign("movingAverageFrame", 20, envir = .GlobalEnv)
 assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP", "SCAN"), envir = .GlobalEnv)
 assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0", "Return=-1"), envir = .GlobalEnv)
+assign("eventElements", c("ID", "MinLatency(us)", "Has started", "Has Finished", "Exit code"), envir = .GlobalEnv)
+
 assign("figureWidth", 1024, envir = .GlobalEnv)
 assign("figureHeight", 512, envir = .GlobalEnv)
 assign("figureRes", 300, envir = .GlobalEnv)
@@ -32,6 +34,11 @@ parseInput <- function(fileName, timeFrame){
   colnames(globalMatrix) <- globalElements
   rownames(globalMatrix) <- possibleActions
   
+  #CREATE event matrix 
+  eventMatrix <- matrix(nrow = length(possibleActions), ncol = length(globalElements))
+  #colnames(eventMatrix) <- eventMatrix
+  #rownames(eventMatrix) <- eventMatrix
+  
   for(action in 1:length(possibleActions)){
     linesOfAction <- grep(paste("[", possibleActions[action], "]", sep = ""), k, fixed=TRUE)
     for(number in linesOfAction){
@@ -51,7 +58,24 @@ parseInput <- function(fileName, timeFrame){
       }
     }
   }
-  return(list(raw = rawData, global =globalMatrix, runTime = runTime, throughPut = throughPut))
+  eventLines <- grep("EVENT", k, fixed=TRUE)
+  eventMatrix <- matrix(nrow = max(0,(length(eventLines)-1)), ncol = length(eventElements))
+  if(length(eventLines) > 1){
+    rownames(eventMatrix) <- seq(1,(length(eventLines)-1))
+    colnames(eventMatrix) <- eventElements[1:length(eventElements)]
+  
+    for(i in 1:(length(eventLines)-1)){
+      line <- eventLines[i+1]
+      lineValue <- lineS[[line]]
+      oldRow <- rownames(eventMatrix)
+      oldRow[i] <- as.numeric(lineValue[3])/1000
+      rownames(eventMatrix) <- oldRow
+      eventMatrix[i,] <- c(lineValue[2], as.numeric(lineValue[4])/1000, lineValue[5], lineValue[6], lineValue[7])
+      
+    }
+    #rownames(eventMatrix) <- eventMatrix
+  }
+  return(list(raw = rawData, global =globalMatrix, runTime = runTime, throughPut = throughPut, events = eventMatrix))
 }
 
 plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
@@ -254,7 +278,7 @@ plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, expo
   
   globalDatas
 }
-input1 <- parseInput("example_code.txt", 200)
+input1 <- parseInput("example_code.txt", 1000)
 input2 <- parseInput("example_code2.txt", 2000)
 
 rawData1 = input1$raw

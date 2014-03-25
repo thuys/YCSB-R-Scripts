@@ -1,4 +1,4 @@
-basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-09/"
+basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-21/"
 queryTypes <- c("UPDATE", "READ", "SCAN", "INSERT")
 dir.create(file.path(outputDir, ""), showWarnings = FALSE)
 
@@ -12,7 +12,7 @@ files[[1]] <- paste(basicDir, "mongodb/threads-%1-2.dat", sep = "")
 nbOfRequests[[1]] <- c(100, 300, 500, 700, 900, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 5000, 6000)
 
 files[[2]] <- paste(basicDir, "postgresql/threads-%1-2.dat", sep = "")
-nbOfRequests[[2]] <- c(20, 50, 100, 150, 200, 250, 300, 400, 500)
+nbOfRequests[[2]] <- c(20, 50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200)
 
 
 files[[3]] <- paste(basicDir, "hbase/threads-%1-2.dat", sep = "")
