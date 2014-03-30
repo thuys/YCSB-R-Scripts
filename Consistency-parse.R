@@ -10,14 +10,12 @@ consistencyParse <- function(fileName){
   
   header <- splitted[[1]]
   
-    
   for(lineNb in 2:length(k)){
     line = splitted[[lineNb]]
     timing <- line[1]
     thread <- line[2]
     start <- line [3]
     if(!is.na(suppressWarnings(as.numeric(timing)))){
-      
       if(length(grep("W", thread)) > 0){
         WThreads[[thread]] <- TRUE
         if(is.null(outputW[[timing]])){
@@ -73,6 +71,7 @@ consistencyPostParse <- function(parsedReader){
       #Collect all changes
       isFirst <- TRUE
       change <- FALSE
+      tryCatch({
       for(start in names(parserThread)){
         if(isFirst){
           isFirst <- FALSE
@@ -80,7 +79,7 @@ consistencyPostParse <- function(parsedReader){
           lastValue <- parserThread[[start]]
           change <- TRUE
         }
-        else if(lastValue[["value"]] != parserThread[[start]][["value"]]){
+        else if(areDifferentNumbersWithNa(lastValue[["value"]], parserThread[[start]][["value"]])){
           threadList[[start]] <- parserThread[[start]]
           lastValue <- parserThread[[start]]
           change <- TRUE
@@ -105,6 +104,7 @@ consistencyPostParse <- function(parsedReader){
           }
         }
       }
+      },error = function(e) print(paste("Problem in parse", thread, start, lastValue[["value"]] , parserThread[[start]][["value"]] )))
       changesInData[[key]][[thread]] <- threadList
     }
     ## 
@@ -112,6 +112,14 @@ consistencyPostParse <- function(parsedReader){
   return(changesInData)
 }
 
+areDifferentNumbersWithNa <- function(number1, number2){
+  if(is.na(number1)){
+    return(!is.na(number2))
+  }else if(is.na(number2)){
+    return(TRUE)
+  }
+  return (number1 != number2)
+}
 consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNames, maxOnSamePlot, exportDir){
   columnNames <- names(readerNames)
   rowNames <- names(parsedReader)
@@ -166,8 +174,9 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
   
   for(i in 1:ceiling(index/maxOnSamePlot)){
     startNumber <- ((i-1)*maxOnSamePlot+1)
-    endNumber <- (i)*maxOnSamePlot
-    png(filename=paste(exportDir, "/consistency-", i, ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    endNumber <- min((i)*maxOnSamePlot, length(index))
+    fileNameSub <- gsub("%number%", i, gsub("%type%", "consistency-%number%", gsub("%extension%", "png", exportDir)))
+    png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
     
     #plot.new()
     plot(x = 0, y = 0, type="n", xlab ="Key number)",ylab = "Amount of changes",
@@ -200,7 +209,7 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
         labelListMerged[indexCounter] <- labelListSplitted[indexCounter][[1]][i]
       }
       else{
-        labelListMerged[indexCounter] <- paste(labelListMerged[indexCounter], labelListSplitted[indexCounter][[1]][i], sep=", ")
+        labelListMerged[indexCounter] <- paste(labelListMerged[indexCounter], labelListSplitted[indexCounter][[1]][i], sep=" ")
       }
       if(i%%4 == 0){
         labelListMerged[indexCounter] <- paste(labelListMerged[indexCounter], "\n", sep="")
@@ -208,13 +217,14 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
     }
   }
 
+  fileNameSub <- gsub("%type%", "consistency-merged", gsub("%extension%", "png", exportDir))
   
-  png(filename=paste(exportDir, "/consistency-merged.png", sep=""), width=figureWidth, height=2*figureHeight, units="px")
+  png(filename=fileNameSub, width=figureWidth, height=2*figureHeight, units="px", res=figureRes)
   oldMar <- par()$mar
   newMar <- oldMar
   newMar[2] <- newMar[2] + 2
   par(mar=newMar)
-  barplot(countPlot, main="Car Distribution by Gears and VS",
+  barplot(countPlot, main="Consistency together",
         xlab="Number of changes", col = c(1:3),
         legend = c(0:max(amountOfChanges)),
         names.arg=labelListMerged, 
@@ -242,8 +252,108 @@ getUniqueThreadID <- function(thread, matrix){
     }
   }
 }
+
+consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, writerNames, exportDir, maxRetries){
+  numberOfWriters <- length(writerNames)
+  plotMatrix <- matrix(nrow = length(parsedWriter), ncol = (2*length(writerNames)+2*maxRetries*length(readerNames)))
+  rownames(plotMatrix) <- names(parsedWriter)
+  
+  colNamesPlot <- rep("", ncol(plotMatrix))
+  for(j in 1:length(writerNames)){
+    threadName <- names(writerNames[j])[1]
+    colNamesPlot[(2*j-1)] <- paste(threadName, "-START", sep="")
+    colNamesPlot[(2*j)] <- paste(threadName, "-DELAY", sep="")
+  }
+  
+  for(j in 1:length(readerNames)){
+    threadName <- names(readerNames[j])[1]
+    for(k in 1:maxRetries){
+      colNamesPlot[(2*numberOfWriters+2*maxRetries*(j-1)+2*k-1)] <- paste(threadName, "-", k, "-START", sep="")
+      colNamesPlot[(2*numberOfWriters+2*maxRetries*(j-1)+2*k)] <- paste(threadName, "-", k, "-DELAY", sep="")
+    }
+  }
+  colnames(plotMatrix) <- colNamesPlot                     
+                      
+  #writer data gathering (delay)
+  for(i in 1:length(parsedWriter)){
+    parserKey <- parsedWriter[i]
+    parserKey <- parserKey[[names(parserKey)[1]]]
+    # zoek alle veranderingen per thread
+    for(j in 1:length(writerNames)){
+      parserThread <- parserKey[j]
+      parserThread <- parserThread[[names(parserThread)[1]]]
+      firstEntry <- parserThread[[names(parserThread)[1]]]
+      
+      plotMatrix[i,(2*j-1)] <- firstEntry[["start"]]/1000
+      plotMatrix[i,(2*j)] <- firstEntry[["delay"]]/1000
+    }
+  }
+  
+  for(i in 1:length(parsedReader)){
+    parserKey <- parsedReader[i]
+    parserKey <- parserKey[[names(parserKey)[1]]]
+    # zoek alle veranderingen per thread
+    for(j in 1:length(readerNames)){
+      parserThread <- parserKey[j]
+      parserThread <- parserThread[[names(parserThread)[1]]]
+      allValue <- names(parserThread)
+      startIndex <- 1
+      for(k in max(length(allValue)-maxRetries+1, 1):length(allValue)){
+        firstEntry <- parserThread[[allValue[k]]]
+        
+        if(length(firstEntry) >0){
+            plotMatrix[i,(2*numberOfWriters+2*maxRetries*(j-1)+2*startIndex-1)] <- firstEntry[["start"]]/1000
+            plotMatrix[i,(2*numberOfWriters+2*maxRetries*(j-1)+2*startIndex)] <- firstEntry[["delay"]]/1000
+        }
+        startIndex <- startIndex + 1
+      }
+      
+    }
+  }
+  rowNames <- names(parsedWriter)
+  labelPlot <- list()
+  labelPlot[1] <- "Writer Start"
+  labelPlot[2] <- "Writer Delay"
+  for(k in 1:maxRetries){
+    labelPlot[(2*k + 1)] <- paste("Reader Try ", k, " Start", sep = "")
+    labelPlot[(2*k + 2)] <- paste("Reader Try ", k, " Delay", sep = "")
+  }
+  labelPlot <- unlist(labelPlot)
+  
+  for(j in 1:length(readerNames)){
+    startIndex <- (2*numberOfWriters+2*maxRetries*(j-1)+1)
+    endIndex <- (2*numberOfWriters+2*maxRetries*(j-1)+2*maxRetries)
+    maxY = max(max(plotMatrix[,1:2],na.rm = TRUE), 
+               max(plotMatrix[,startIndex:endIndex], na.rm = TRUE) ,na.rm = TRUE)
+    fileNameSub <- gsub("%type%", paste("consistency-plot-", names(readerNames)[j], sep=""), gsub("%extension%", "png", exportDir))
+    png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
+    plot(x = 0, y = 0, type="n", xlab ="Key number)",ylab = "Time (ms)",
+         ylim = c(0, maxY), xlim = as.numeric(c(min(rowNames), max(rowNames))))
+    
+    #Plot writers
+    lines(x=rowNames, y = plotMatrix[,1],type="l",col = 1, pch = 1)
+    lines(x=rowNames, y = plotMatrix[,2],type="l",col = 2, pch = 2)
+    
+    for(k in 1:maxRetries){
+      if(k == 1){
+        plotType <- "l"
+      }else{
+        plotType <- "b"
+      }
+      lines(x=rowNames, y = plotMatrix[,startIndex + 2*(k-1)],type=plotType,col = (2*k+1), pch = (2*k+1))
+      lines(x=rowNames, y = plotMatrix[,startIndex + 2*(k-1)+1],type=plotType,col = (2*k+2), pch = (2*k+2))
+    }
+    legend("topright", labelPlot, col = 1:(2*maxRetries+2), pch = 1:(2*maxRetries+2))
+    
+    dev.off(); 
+    
+  }
+}
+
+
 fileName ="D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/InsertRawData"
 parsed <- consistencyParse(fileName)
 postParsed <- consistencyPostParse(parsed$outputR)
 
-consistencyPlotNb(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, 3, "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/Consistency")
+consistencyPlotNb(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, 3, "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/Consistency/%type%.%extension%")
+consistencyPlotEachReader(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/Consistency/%type%.%extension%", 2)

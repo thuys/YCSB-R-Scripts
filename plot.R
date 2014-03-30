@@ -8,7 +8,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
   data <- list();
   rawData <- list();
   for(i in 1:length(fileNames)){
-    returnValue = parseInput(sub("%1", fileNames[i], fileName), timeFrame)
+    returnValue = parseInput(gsub("%1", fileNames[i], fileName), timeFrame)
     data[[i]] <- returnValue
     rawData[[i]] <- returnValue$raw
     
@@ -16,7 +16,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
     #minY = min(rawData[[i]][, labels], na.rm = TRUE)
     maxY = max(movingAverage(rawData[[i]][(sToRemove*timeFrame/1000):nrow(rawData[[i]]), labels], movingAverageFrame), na.rm = TRUE)
     
-    png(filename=paste(plotDir, "/single-graph-",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    png(filename=paste(plotDir, "/single-graph-",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plotSingleData(rawData[[i]][1:(nrow(rawData[[i]])-safetyMarginBeforeInterruptBefore),], labels, 
                    paste("Plot of", plotNames[i])
                    , sToRemove, data[[i]]$runTime/1000, minY, 1.5*maxY)
@@ -64,7 +64,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       for(maxIndex in 1:length(interruptedData)){
         maxY = max(maxY, max(movingAverage(interruptedData[[maxIndex]][(sToRemove*timeFrame/1000):nrow(interruptedData[[maxIndex]]), label], movingAverageFrame), na.rm = TRUE), na.rm = TRUE)
       }
-      png(filename=paste(plotDir, "/multiple-graph-", plotNames[i], "-" ,label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+      png(filename=paste(plotDir, "/multiple-graph-", plotNames[i], "-" ,label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
       plotMultipleDataSingleLabel(interruptedData, label, interruptedPlotNames, 
                                   paste("Plot of", label, "for", plotNames[i], "between interrupt moments.")
                                   , sToRemove, maxX, minY, 1.5*maxY)
@@ -90,7 +90,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       for(label in labels){
           maxY = max(maxY, max(interruptedData[[interruptIndex]][,label], na.rm = TRUE), na.rm = TRUE)
       }
-      png(filename=paste(plotDir, "/multiple-graph-interrupt-", plotNames[i], "-", interruptLabels[2*(interruptIndex)], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+      png(filename=paste(plotDir, "/multiple-graph-interrupt-", plotNames[i], "-", interruptLabels[2*(interruptIndex)], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
       plotSingleData(interruptedData[[interruptIndex]], labels, 
                      paste("Plot of", plotNames[i], "on", interruptLabels[2*(interruptIndex)])
                      , startIndex, endIndex, minY, 1.5*maxY)

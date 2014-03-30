@@ -4,8 +4,8 @@ assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP", "SCAN"), envi
 assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0", "Return=-1"), envir = .GlobalEnv)
 assign("eventElements", c("ID", "MinLatency(us)", "Has started", "Has Finished", "Exit code"), envir = .GlobalEnv)
 
-assign("figureWidth", 1024, envir = .GlobalEnv)
-assign("figureHeight", 512, envir = .GlobalEnv)
+assign("figureWidth", 4096, envir = .GlobalEnv)
+assign("figureHeight", 2048, envir = .GlobalEnv)
 assign("figureRes", 300, envir = .GlobalEnv)
 library(ggplot2) 
 parseInput <- function(fileName, timeFrame){
@@ -127,7 +127,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
     minY = 0
     #minY = min(rawData[[i]][, labels], na.rm = TRUE)
     maxY = max(rawData[[i]][(sToRemove*timeFrames[i]/1000):nrow(rawData[[i]]), labels], na.rm = TRUE)
-    png(filename=paste(exportDir, "/single-graph",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    png(filename=paste(exportDir, "/single-graph",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plotSingleData(rawData[[i]], labels, 
                    paste("Plot of", fileNames[i])
                    , sToRemove, data[[i]]$runTime/1000, minY, maxY)
@@ -144,7 +144,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
       maxX = max(minY, data[[i]]$runTime/1000, na.rm = TRUE)
     }
 
-    png(filename=paste(exportDir, "/multiple-graph",label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    png(filename=paste(exportDir, "/multiple-graph",label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plotMultipleDataSingleLabel(rawData, label, fileNames, 
                    paste("Plot of", label)
                    , sToRemove, maxX, minY, maxY)
@@ -232,7 +232,7 @@ plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, expo
     maxY = max(max(globalDatas[[dbs]], na.rm = TRUE), maxY, na.rm = TRUE)
   }
   
-  png(filename=paste(exportDir, "/loadbalance-all", ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+  png(filename=paste(exportDir, "/loadbalance-all", ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
   plotMultipleLoadMultipleLabels(globalDatas, labels, dbNames, "Load plot", minX, maxX, minY, maxY)
   dev.off(); 
   
@@ -248,7 +248,7 @@ plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, expo
       minX = min(min(nbOfRequests[[dbs]], na.rm = TRUE), minX, na.rm = TRUE)
       maxX = max(max(nbOfRequests[[dbs]], na.rm = TRUE), maxX, na.rm = TRUE)
     }
-    png(filename=paste(exportDir, "/loadbalance-label-",label, ".png", sep=""))
+    png(filename=paste(exportDir, "/loadbalance-label-",label, ".png", sep=""), res=figureRes)
     plotMultipleLoadSingleLabel(globalDatas, label, dbNames, paste("Plot of", label), minX, maxX, minY, maxY)
     dev.off(); 
   }
@@ -264,11 +264,11 @@ plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, expo
       minY = min(min(globalDatas[[dbs]][,label], na.rm = TRUE), minY, na.rm = TRUE)
       maxY = max(max(globalDatas[[dbs]][,label], na.rm = TRUE), maxY, na.rm = TRUE)
     }
-    png(filename=paste(exportDir, "/loadbalance-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    png(filename=paste(exportDir, "/loadbalance-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plotSingleLoadMultipleLabels(globalDatas[[dbs]], labels, paste("Plot for", dbNames[[dbs]]), minX, maxX, minY, maxY)
     dev.off(); 
     
-    png(filename=paste(exportDir, "/loadbalance-realthroughput-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px")
+    png(filename=paste(exportDir, "/loadbalance-realthroughput-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plot(x = rownames(averageLatency[[dbs]]), y = (averageLatency[[dbs]]/as.numeric(rownames(averageLatency[[dbs]]))),
          type="b", main=paste("Requested vs real requests for", dbNames[[dbs]]), 
          xlab ="Requested nb of requests/s",ylab = "Real nb of requests/s / Requested nb of requests/s",  
