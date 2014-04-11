@@ -14,7 +14,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
     
     minY = 0
     #minY = min(rawData[[i]][, labels], na.rm = TRUE)
-    maxY = max(movingAverage(rawData[[i]][(sToRemove*timeFrame/1000):nrow(rawData[[i]]), labels], movingAverageFrame), na.rm = TRUE)
+    maxY = max(movingAverage(rawData[[i]][(sToRemove*timeFrame/1000):(nrow(rawData[[i]])-sToRemove), labels], movingAverageFrame), na.rm = TRUE)
     
     png(filename=paste(plotDir, "/single-graph-",fileNames[i], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plotSingleData(rawData[[i]][1:(nrow(rawData[[i]])-safetyMarginBeforeInterruptBefore),], labels, 

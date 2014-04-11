@@ -162,11 +162,11 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
     if(threadNumber == thread){
       index <- index + 1
       labelThreads[thread] <- index
-      labelList[index] <- thread
+      labelList[index] <- (thread-1)
       labelIndex[index] <- thread
     }
     else{
-      labelList[labelThreads[[threadNumber]]] <- paste(labelList[labelThreads[[threadNumber]]], thread, sep = ", ")
+      labelList[labelThreads[[threadNumber]]] <- paste(labelList[labelThreads[[threadNumber]]], (thread-1), sep = ", ")
     }
   }
   
@@ -174,7 +174,7 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
   
   for(i in 1:ceiling(index/maxOnSamePlot)){
     startNumber <- ((i-1)*maxOnSamePlot+1)
-    endNumber <- min((i)*maxOnSamePlot, length(index))
+    endNumber <- min((i)*maxOnSamePlot, index)
     fileNameSub <- gsub("%number%", i, gsub("%type%", "consistency-%number%", gsub("%extension%", "png", exportDir)))
     png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
     
