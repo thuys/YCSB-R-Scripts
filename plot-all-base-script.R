@@ -52,7 +52,7 @@ test <- tryCatch({
                   timeFrame, queryTypes, basicDir)
 }, error = function(e) print(paste("Problem in all graph", e)))
 
-types <- c("", "-kill")
+types <- c("", "-kill", "-drop")
 
 
 for(run in c(1,2)){
@@ -89,9 +89,10 @@ for(run in c(1,2)){
                            c(
                              paste("2",type, "-" ,run,sep=""), 
                              paste("3",type, "-" ,run,sep=""),
+                             paste("4",type, "-" ,run,sep=""),
                              paste("5",type, "-" ,run,sep="")
                            ), 
-                           c("Node 2", "Node 3", "Node 5"), 
+                           c("Node 2", "Node 3", "Node 4", "Node 5"), 
                            1000, 
                            queryTypes, 
                            outputDir, 
@@ -99,7 +100,7 @@ for(run in c(1,2)){
                            c("All online", "Shut down", "One offline", "Power on", "All online")
                            
         )
-      },error = function(e) print(paste("Problem in " + hbaseType + " continious run", run, type, e))
+      },error = function(e) print(paste("Problem in ", hbaseType, " continious run", run, type, e))
       )
     }
   }

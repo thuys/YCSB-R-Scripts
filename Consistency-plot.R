@@ -1,13 +1,14 @@
-dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-30/mongodb-consistency/"
-dirHbase <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-30/hbase-consistency/"
+dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-04-22/mongodb-consistency/"
+dirHbase <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-04-22/hbase-consistency/"
 
 writeOpps <- c("none", "safe", "normal", "fsync_safe", "replicas_safe", "majority")
-readOpps <- c("nearest", "primary", "primarypreferred", "secondary", "secondarypreferred")
+#readOpps <- c("nearest", "primary", "primarypreferred", "secondary", "secondarypreferred")
+readOpps <- c("nearest")
 typeOpps <- c("insert", "update")
 loops <- c("1", "2")
 loopsHbase <- c("1", "2")
 
-writeOpps <- c()
+#writeOpps <- c()
 dir.create(file.path(dir, "Fig/"), showWarnings = FALSE)
 dir.create(file.path(dirHbase, "Fig/"), showWarnings = FALSE)
 
