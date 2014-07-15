@@ -1,4 +1,5 @@
-basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-04-10/"
+source('plot.R')
+basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/"
 queryTypes <- c("UPDATE", "READ", "SCAN", "INSERT")
 dir.create(file.path(basicDir, ""), showWarnings = FALSE)
 
@@ -24,7 +25,7 @@ tryCatch({
 
 tryCatch({
   plotThreadTesting(paste(basicDir, "hbase/threads-%1-2.dat", sep = ""),
-                  c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75, 100, 125, 150, 200), workload, timeFrame, paste(basicDir, "threads-hbase.png", sep=""))
+                  c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75, 100), workload, timeFrame, paste(basicDir, "threads-hbase.png", sep=""))
 }, error = function(e) print(paste("Problem in hbase postgresql", e)))
 
 tryCatch({
@@ -36,19 +37,19 @@ tryCatch({
 files <- list()
 nbOfRequests <- list()
 
+#files[[1]] <- paste(basicDir, "hbase/target-%1-2.dat", sep = "")
+#nbOfRequests[[1]] <- c(50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 4000)
+
+files[[2]] <- paste(basicDir, "mongodb/target-%1-2.dat", sep = "")
+nbOfRequests[[2]] <- c(50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 4000)
 
 files[[1]] <- paste(basicDir, "postgresql/target-%1-2.dat", sep = "")
 nbOfRequests[[1]] <- c(50, 100, 150, 200, 250, 300, 400, 500, 600, 700)
 
-
-files[[2]] <- paste(basicDir, "hbase/target-%1-2.dat", sep = "")
-nbOfRequests[[2]] <- c(50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000)
-
-files[[3]] <- paste(basicDir, "mongodb/target-%1-2.dat", sep = "")
-nbOfRequests[[3]] <- c(100, 300, 500, 700, 900, 1000, 1250, 1500, 1750, 2000, 2500, 3000, 3500, 4000, 5000, 6000)
-
+labelLoad <- c("HBase", "MongoDB", "PostgreSQL")
+labelLoad <- c("PostgreSQL", "MongoDB")
 test <- tryCatch({
-  plotLoadTesting(files, c("PostgreSQL", "HBase", "MongoDB"), nbOfRequests, 
+plotLoadTesting(files, labelLoad, nbOfRequests, 
                   timeFrame, queryTypes, basicDir)
 }, error = function(e) print(paste("Problem in all graph", e)))
 
@@ -116,11 +117,9 @@ for(run in c(1,2)){
                          c(
                            paste("1",type, "-" ,run,sep=""), 
                            paste("2",type, "-" ,run,sep=""),
-                           paste("3",type, "-" ,run,sep=""),
-                           paste("4",type, "-" ,run,sep=""),
-                           paste("5",type, "-" ,run,sep="")
+                           paste("3",type, "-" ,run,sep="")
                          ), 
-                         c("Node 1", "Node 2", "Node 3", "Node 4", "Node 5"), 
+                         c("Node 1", "Node 2", "Node 3"), 
                          1000, 
                          queryTypes, 
                          outputDir, 

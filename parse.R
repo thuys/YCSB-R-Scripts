@@ -1,13 +1,17 @@
-assign("sToRemove", 10, envir = .GlobalEnv)
+assign("debugmodus", FALSE, envir = .GlobalEnv)
+assign("sToRemove", 100, envir = .GlobalEnv)
 assign("movingAverageFrame", 20, envir = .GlobalEnv)
 assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP", "SCAN"), envir = .GlobalEnv)
 assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0", "Return=-1"), envir = .GlobalEnv)
 assign("eventElements", c("ID", "MinLatency(us)", "Has started", "Has Finished", "Exit code"), envir = .GlobalEnv)
 
-assign("figureWidth", 4048, envir = .GlobalEnv)
+assign("figureWidth", 2048, envir = .GlobalEnv)
 assign("figureHeight", 2048, envir = .GlobalEnv)
 assign("figureRes", 300, envir = .GlobalEnv)
 library(ggplot2) 
+
+source('includes.R')
+
 parseInput <- function(fileName, timeFrame){
   
   #READ FILE
@@ -81,7 +85,7 @@ parseInput <- function(fileName, timeFrame){
 plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Time(s)",ylab = "Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Tijd(s)",ylab = "Vertraging(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   colNb <- 0
   for(label in labels){
@@ -101,7 +105,7 @@ plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoint
 plotMultipleDataSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Time(s)",ylab = "Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Tijd(s)",ylab = "Vertraging(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
 
   for(index in 1:length(datas)){
@@ -155,7 +159,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
 plotSingleLoadMultipleLabels = function(data, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   for(index in 1:length(labels)){
@@ -169,7 +173,7 @@ plotSingleLoadMultipleLabels = function(data, labels, title, minX, maxX, minY, m
 plotMultipleLoadSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   for(index in 1:length(datas)){
@@ -182,7 +186,7 @@ plotMultipleLoadSingleLabel = function(datas, type, labels, title, minX, maxX, m
 plotMultipleLoadMultipleLabels = function(datas, types, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
+  plot(x = 0, y = 0, type="n", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   legende = c(1:(length(types)*length(datas)))
@@ -271,7 +275,7 @@ plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, expo
     png(filename=paste(exportDir, "/loadbalance-realthroughput-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plot(x = rownames(averageLatency[[dbs]]), y = (averageLatency[[dbs]]/as.numeric(rownames(averageLatency[[dbs]]))),
          type="b", main=paste("Requested vs real requests for", dbNames[[dbs]]), 
-         xlab ="Requested nb of requests/s",ylab = "Real nb of requests/s / Requested nb of requests/s",  
+         xlab ="Theoretisch aantal queries/s",ylab = "Fractie Reeel aantal queries/s t.o.v. Theoretisch aantal queries/s",  
          xlim = c(minX, maxX), ylim=c(0,1))
     dev.off(); 
   }
@@ -316,47 +320,48 @@ plotThreadTesting = function(fileRegX, threads, workload, timeFrame, export){
   png(filename=export, width=figureWidth, height=figureHeight, units="px", res=figureRes)
   plot.new()
   heading = paste("Plot of effect on increase on number of threads") 
-  plot(x = plotData[, 2], y = plotData[, 1], type="o", main=heading, xlab ="Nb of requests/s",ylab = "Average Latency(ms)",
+  plot(x = plotData[, 2], y = plotData[, 1], type="o", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   text( x = (plotData[, 2]-0.05*maxY), y = plotData[, 1], labels = threads)
   dev.off(); 
 
 }
 
-
-input1 <- parseInput("example_code.txt", 1000)
-input2 <- parseInput("example_code2.txt", 2000)
-
-rawData1 = input1$raw
-rawData2 = input2$raw
-
-globalData1 = input1$global
-#plotSingleData(rawData1, c("UPDATE", "READ"), "TEST PLOT", 0, input1$runTime, 0, max(rawData1[, 2], na.rm = TRUE))
-#plotSingleData(rawData2, c("UPDATE", "READ"), "TEST PLOT", 0, input2$runTime, 0, max(rawData2[, 2], na.rm = TRUE))
-
-#plotMultipleDataSingleLabel(list(rawData1, rawData2), "READ", c("1", "2"),"TEST PLOT", 0, input2$runTime, 0, max(rawData2[, 2], na.rm = TRUE))
-#plotAll(c("example_code.txt", "example_code2.txt"), c("file-1", "file-2"), c(200, 1000),
-#        c("UPDATE", "READ"), ".")
-
-#files <- list()
-#nbOfRequests <- list()
-timeFrame <- 1000
-
-#files[[1]] <- paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-%1.dat")
-
-#nbOfRequests[[1]] <- c(1,2,3)
-
-#files[[2]] <- paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-%1.dat")
-
-#nbOfRequests[[2]] <- c(1,2)
-#test <- plotLoadTesting(files, c("MongoDB", "PostgreSQL"), nbOfRequests, 
-#                timeFrame, c("UPDATE", "READ"), ".")
-
-workload <- list()
-
-workload["READ"] <- 0.4
-workload["UPDATE"] <- 0.2
-workload["SCAN"] <- 0.2
-workload["INSERT"] <- 0.2
-plotThreadTesting("D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-04-10/postgresql/threads-%1-2.dat",
+if(debugmodus){
+  input1 <- parseInput("example_code.txt", 1000)
+  input2 <- parseInput("example_code2.txt", 2000)
+  
+  rawData1 = input1$raw
+  rawData2 = input2$raw
+  
+  globalData1 = input1$global
+  #plotSingleData(rawData1, c("UPDATE", "READ"), "TEST PLOT", 0, input1$runTime, 0, max(rawData1[, 2], na.rm = TRUE))
+  #plotSingleData(rawData2, c("UPDATE", "READ"), "TEST PLOT", 0, input2$runTime, 0, max(rawData2[, 2], na.rm = TRUE))
+  
+  #plotMultipleDataSingleLabel(list(rawData1, rawData2), "READ", c("1", "2"),"TEST PLOT", 0, input2$runTime, 0, max(rawData2[, 2], na.rm = TRUE))
+  #plotAll(c("example_code.txt", "example_code2.txt"), c("file-1", "file-2"), c(200, 1000),
+  #        c("UPDATE", "READ"), ".")
+  
+  #files <- list()
+  #nbOfRequests <- list()
+  timeFrame <- 1000
+  
+  #files[[1]] <- paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/all-%1.dat")
+  
+  #nbOfRequests[[1]] <- c(1,2,3)
+  
+  #files[[2]] <- paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/all-%1.dat")
+  
+  #nbOfRequests[[2]] <- c(1,2)
+  #test <- plotLoadTesting(files, c("MongoDB", "PostgreSQL"), nbOfRequests, 
+  #                timeFrame, c("UPDATE", "READ"), ".")
+  
+  workload <- list()
+  
+  workload["READ"] <- 0.4
+  workload["UPDATE"] <- 0.2
+  workload["SCAN"] <- 0.2
+  workload["INSERT"] <- 0.2
+  plotThreadTesting("D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-04-10/postgresql/threads-%1-2.dat",
                              c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75), workload, timeFrame, "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-04-10/postgresql/test.png")
+}

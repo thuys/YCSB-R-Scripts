@@ -4,6 +4,7 @@ assign("safetyMarginBeforeInterruptAfter", 30, envir = .GlobalEnv)
 assign("marginBeforeInterrupt", 30, envir = .GlobalEnv)
 assign("marginAfterInterrupt", 60, envir = .GlobalEnv)
 
+source('parse.R')
 plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels, plotDir, interruptPoints, interruptLabels){
   data <- list();
   rawData <- list();
@@ -66,7 +67,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       }
       png(filename=paste(plotDir, "/multiple-graph-", plotNames[i], "-" ,label, ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
       plotMultipleDataSingleLabel(interruptedData, label, interruptedPlotNames, 
-                                  paste("Plot of", label, "for", plotNames[i], "between interrupt moments.")
+                                  paste("Plot van", label, "for", plotNames[i], "tussen event momenten.")
                                   , sToRemove, maxX, minY, 1.5*maxY)
       
       dev.off(); 
@@ -98,63 +99,78 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       dev.off(); 
       
     }
+    
+    ## Now boxplot
+    for(label in labels){
+      boxplotData <- data.frame(a = rawData[[i]][150:250,label])
+      boxplotData["400-500s"] <- rawData[[i]][400:500,label]
+      boxplotData["700-800s"] <- rawData[[i]][700:800,label]
+      
+      png(filename=paste(plotDir, "/boxplot-graph-", plotNames[i], "-" ,label, ".png", sep=""), 
+          width=figureWidth, height=figureHeight, units="px", res=figureRes)
+      
+      boxplot(boxplotData, ylab="Vertraging(ms)", outline = FALSE, names=c("150-250s", "400-500s", "700-800s"))
+      dev.off(); 
+    }
   }
 }
 
-for(run in 3:3){
-  tryCatch({
-    plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/continious-%1.dat",
-      c(
-        paste("1-",run,sep=""), 
-        paste("2-",run,sep="")
-      ), 
-      c("Node 1", "Node 2"), 
-      1000, 
-      c("UPDATE", "READ"), 
-      paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/Fig/Continious-Run-", run, sep=""), 
-      c(301,601), 
-      c("All online", "Shut down", "One offline", "Power on", "All online")
+if(debugmodus){
+  for(run in 3:3){
+    tryCatch({
+      plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/continious-%1.dat",
+        c(
+          paste("1-",run,sep=""), 
+          paste("2-",run,sep="")
+        ), 
+        c("Node 1", "Node 2"), 
+        1000, 
+        c("UPDATE", "READ"), 
+        paste("D:/Schooljaar 2013-2014/Thesis/Results/postgresql/Fig/Continious-Run-", run, sep=""), 
+        c(301,601), 
+        c("All online", "Shut down", "One offline", "Power on", "All online")
+      )
+    },error = function(e) print(paste("Problem in postgresql continious run", run, e))
     )
-  },error = function(e) print(paste("Problem in postgresql continious run", run, e))
-  )
-}
-
-for(run in 3:3){
-  tryCatch({
-    plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/hbase/continious-%1.dat",
-                       c(
-                         paste("2-",run,sep=""), 
-                         paste("3-",run,sep=""),
-                         paste("5-",run,sep="")
-                       ), 
-                       c("Node 2", "Node 3", "Node 5"), 
-                       1000, 
-                       c("UPDATE", "READ"), 
-                       paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/Fig/Continious-Run-", run, sep=""), 
-                       c(301,601), 
-                       c("All online", "Shut down", "One offline", "Power on", "All online")
-                       
+  }
+  
+  for(run in 3:3){
+    tryCatch({
+      plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/hbase/continious-%1.dat",
+                         c(
+                           paste("2-",run,sep=""), 
+                           paste("3-",run,sep=""),
+                           paste("5-",run,sep="")
+                         ), 
+                         c("Node 2", "Node 3", "Node 5"), 
+                         1000, 
+                         c("UPDATE", "READ"), 
+                         paste("D:/Schooljaar 2013-2014/Thesis/Results/hbase/Fig/Continious-Run-", run, sep=""), 
+                         c(301,601), 
+                         c("All online", "Shut down", "One offline", "Power on", "All online")
+                         
+      )
+    },error = function(e) print(paste("Problem in hbase continious run", run, e))
     )
-  },error = function(e) print(paste("Problem in hbase continious run", run, e))
-  )
-}
-
-for(run in 3:3){
-  tryCatch({
-    plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/continious-%1.dat",
-                       c(
-                         paste("1-",run,sep=""), 
-                         paste("2-",run,sep=""),
-                         paste("3-",run,sep="")
-                       ), 
-                       c("Node 1", "Node 2", "Node 3"), 
-                       1000, 
-                       c("UPDATE", "READ"), 
-                       paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/Fig/Continious-Run-", run, sep=""), 
-                       c(301,601), 
-                       c("All online", "Shut down", "One offline", "Power on", "All online")
-                       
+  }
+  
+  for(run in 3:3){
+    tryCatch({
+      plotWithInterrupts("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/continious-%1.dat",
+                         c(
+                           paste("1-",run,sep=""), 
+                           paste("2-",run,sep=""),
+                           paste("3-",run,sep="")
+                         ), 
+                         c("Node 1", "Node 2", "Node 3"), 
+                         1000, 
+                         c("UPDATE", "READ"), 
+                         paste("D:/Schooljaar 2013-2014/Thesis/Results/mongodb/Fig/Continious-Run-", run, sep=""), 
+                         c(301,601), 
+                         c("All online", "Shut down", "One offline", "Power on", "All online")
+                         
+      )
+    },error = function(e) print(paste("Problem in mongodb continious run", run, e))
     )
-  },error = function(e) print(paste("Problem in mongodb continious run", run, e))
-  )
+  }
 }

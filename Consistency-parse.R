@@ -1,3 +1,4 @@
+source('plot.R')
 consistencyParse <- function(fileName){
   #READ FILE
   k <- readLines(fileName, warn = FALSE)
@@ -162,7 +163,7 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
     if(threadNumber == thread){
       index <- index + 1
       labelThreads[thread] <- index
-      labelList[index] <- (thread-1)
+      labelList[index] <- paste((thread-1), "", sep="")
       labelIndex[index] <- thread
     }
     else{
@@ -185,7 +186,7 @@ consistencyPlotNb <- function(parsedReader, parsedWriter, readerNames, writerNam
     for(plotNb in startNumber:endNumber){
       lines(x=rowNames, y = amountOfChanges[,labelIndex[[plotNb]]],type="l",col = plotNb, pch = plotNb)
     }
-    legend("topleft", labelArray[startNumber:endNumber], col = startNumber:endNumber, pch = startNumber:endNumber)
+    legend("topleft", legend=labelArray[startNumber:endNumber], col = startNumber:endNumber, pch = startNumber:endNumber)
     dev.off(); 
   }
   
@@ -350,10 +351,11 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
   }
 }
 
-
+if(debugmodus){
 fileName ="D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/InsertRawData"
 parsed <- consistencyParse(fileName)
 postParsed <- consistencyPostParse(parsed$outputR)
 
 consistencyPlotNb(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, 3, "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/Consistency/%type%.%extension%")
 consistencyPlotEachReader(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/Consistency/%type%.%extension%", 2)
+}
