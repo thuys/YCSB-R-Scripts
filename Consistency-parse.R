@@ -257,13 +257,23 @@ getUniqueThreadID <- function(thread, matrix){
 consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, writerNames, exportDir, maxRetries){
   numberOfWriters <- length(writerNames)
   plotMatrix <- matrix(nrow = length(parsedWriter), ncol = (2*length(writerNames)+2*maxRetries*length(readerNames)))
+  
+  density <- matrix(nrow = length(parsedWriter), ncol = (2*length(writerNames)+2*length(readerNames)))
+  
   rownames(plotMatrix) <- names(parsedWriter)
+  rownames(density) <- names(parsedWriter)
   
   colNamesPlot <- rep("", ncol(plotMatrix))
+  densityNamesPlot<- rep("", ncol(density))
+  
   for(j in 1:length(writerNames)){
     threadName <- names(writerNames[j])[1]
     colNamesPlot[(2*j-1)] <- paste(threadName, "-START", sep="")
     colNamesPlot[(2*j)] <- paste(threadName, "-DELAY", sep="")
+    
+    densityNamesPlot[(2*j-1)] <- paste(threadName, "-START", sep="")
+    densityNamesPlot[(2*j)] <- paste(threadName, "-DELAY", sep="")
+    
   }
   
   for(j in 1:length(readerNames)){
@@ -272,9 +282,13 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
       colNamesPlot[(2*numberOfWriters+2*maxRetries*(j-1)+2*k-1)] <- paste(threadName, "-", k, "-START", sep="")
       colNamesPlot[(2*numberOfWriters+2*maxRetries*(j-1)+2*k)] <- paste(threadName, "-", k, "-DELAY", sep="")
     }
+    
+    densityNamesPlot[(2*numberOfWriters+2*j-1)] <- paste(threadName, "-START", sep="")
+    densityNamesPlot[(2*numberOfWriters+2*j)] <- paste(threadName, "-DELAY", sep="")
   }
   colnames(plotMatrix) <- colNamesPlot                     
-                      
+  colnames(density) <- densityNamesPlot   
+  
   #writer data gathering (delay)
   for(i in 1:length(parsedWriter)){
     parserKey <- parsedWriter[i]
@@ -350,6 +364,23 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     
   }
 }
+
+consistencyDensityPlot <- function(postParsed, outputWriters, readerThreads, writerThreads, fileDir){
+  densityData <- list()
+  
+  
+}
+
+    tryCatch({
+      fileName <- paste(dirHbase, typeOpp, "RawData-", loop, ".dat", sep="")
+      fileDir <- paste(dirHbase, "Fig/%type%-", typeOpp, "RawData-", loop, ".%extension%", sep="")
+      parsed <- consistencyParse(fileName)
+      postParsed <- consistencyPostParse(parsed$outputR)
+      consistencyPlotNb(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, 3, fileDir)
+      consistencyDensityPlot(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, fileDir)
+      consistencyPlotEachReader(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, fileDir, 2)
+    }, error = function(e) print(paste("Problem in ", typeOpp, loop, e)))
+
 
 if(debugmodus){
 fileName ="D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-03-24/InsertRawData"

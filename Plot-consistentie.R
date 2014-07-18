@@ -1,15 +1,16 @@
 source('Consistency-parse.R')
 
-dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-05-19/mongodb-consistency/"
-dirHbase <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-05-19/hbase-consistency/"
+dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/mongodb-consistency/"
+dirHbase <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/hbase-consistency/"
 
-writeOpps <- c("none", "safe", "normal", "fsync_safe", "replicas_safe", "majority")
+writeOpps <- c("safe", "normal", "fsync_safe", "replicas_safe", "majority")
 readOpps <- c("nearest", "primary", "primarypreferred", "secondary", "secondarypreferred")
 #writeOpps <- c("none")
 #readOpps <- c("nearest")
 typeOpps <- c("insert", "update")
 loops <- c("1", "2")
-loopsHbase <- c("1", "2")
+loops <- c()
+loopsHbase <- c("5", "6")
 
 #writeOpps <- c()
 dir.create(file.path(dir, "Fig/"), showWarnings = FALSE)

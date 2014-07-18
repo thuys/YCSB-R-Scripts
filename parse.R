@@ -6,8 +6,9 @@ assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)",
 assign("eventElements", c("ID", "MinLatency(us)", "Has started", "Has Finished", "Exit code"), envir = .GlobalEnv)
 
 assign("figureWidth", 2048, envir = .GlobalEnv)
+assign("figureWidthSquare", 2048, envir = .GlobalEnv)
 assign("figureHeight", 2048, envir = .GlobalEnv)
-assign("figureRes", 300, envir = .GlobalEnv)
+assign("figureRes", 350, envir = .GlobalEnv)
 library(ggplot2) 
 
 source('includes.R')
@@ -85,7 +86,7 @@ parseInput <- function(fileName, timeFrame){
 plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Tijd(s)",ylab = "Vertraging(ms)",
+  plot(x = 0, y = 0, type="n", xlab ="Tijd(s)",ylab = "Vertraging(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   colNb <- 0
   for(label in labels){
@@ -105,7 +106,7 @@ plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoint
 plotMultipleDataSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Tijd(s)",ylab = "Vertraging(ms)",
+  plot(x = 0, y = 0, type="n", xlab ="Tijd(s)",ylab = "Vertraging(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
 
   for(index in 1:length(datas)){
@@ -159,7 +160,7 @@ plotAll = function(files, fileNames, timeFrames, labels, exportDir){
 plotSingleLoadMultipleLabels = function(data, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
+  plot(x = 0, y = 0, type="n", xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   for(index in 1:length(labels)){
@@ -173,7 +174,7 @@ plotSingleLoadMultipleLabels = function(data, labels, title, minX, maxX, minY, m
 plotMultipleLoadSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
+  plot(x = 0, y = 0, type="n", xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   for(index in 1:length(datas)){
@@ -186,7 +187,7 @@ plotMultipleLoadSingleLabel = function(datas, type, labels, title, minX, maxX, m
 plotMultipleLoadMultipleLabels = function(datas, types, labels, title, minX, maxX, minY, maxY){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
+  plot(x = 0, y = 0, type="n",  xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   
   legende = c(1:(length(types)*length(datas)))
@@ -274,8 +275,8 @@ plotLoadTesting = function(files, dbNames, nbOfRequests, timeFrame, labels, expo
     
     png(filename=paste(exportDir, "/loadbalance-realthroughput-db-", dbNames[[dbs]], ".png", sep=""), width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plot(x = rownames(averageLatency[[dbs]]), y = (averageLatency[[dbs]]/as.numeric(rownames(averageLatency[[dbs]]))),
-         type="b", main=paste("Requested vs real requests for", dbNames[[dbs]]), 
-         xlab ="Theoretisch aantal queries/s",ylab = "Fractie Reeel aantal queries/s t.o.v. Theoretisch aantal queries/s",  
+         type="b", 
+         xlab ="Theoretisch aantal queries/s",ylab = "Fractie reëel /theoretisch aantal queries/s",  
          xlim = c(minX, maxX), ylim=c(0,1))
     dev.off(); 
   }
@@ -317,12 +318,12 @@ plotThreadTesting = function(fileRegX, threads, workload, timeFrame, export){
   maxX <- max(plotData[, 2], na.rm = TRUE)
   
 
-  png(filename=export, width=figureWidth, height=figureHeight, units="px", res=figureRes)
+  png(filename=export, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
   plot.new()
   heading = paste("Plot of effect on increase on number of threads") 
-  plot(x = plotData[, 2], y = plotData[, 1], type="o", main=heading, xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
+  plot(x = plotData[, 2], y = plotData[, 1], type="o", xlab ="Aantal of queries/s",ylab = "Gemiddelde(ms)",
        xlim = c(minX, maxX), ylim = c(minY, maxY))
-  text( x = (plotData[, 2]-0.05*maxY), y = plotData[, 1], labels = threads)
+  text( x = (plotData[, 2]+0.02*maxX), y = (plotData[, 1]+0.02*maxY), labels = threads, cex = 1.25)
   dev.off(); 
 
 }

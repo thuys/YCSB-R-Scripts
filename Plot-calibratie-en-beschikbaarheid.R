@@ -1,5 +1,5 @@
 source('plot.R')
-basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/"
+basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-17/"
 queryTypes <- c("UPDATE", "READ", "SCAN", "INSERT")
 dir.create(file.path(basicDir, ""), showWarnings = FALSE)
 
@@ -17,37 +17,38 @@ workload["UPDATE"] <- 0.2
 workload["SCAN"] <- 0.2
 workload["INSERT"] <- 0.2
 
+threads <- c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75, 100)
 
 tryCatch({
   plotThreadTesting(paste(basicDir, "postgresql/threads-%1-2.dat", sep = ""),
-                  c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75), workload, timeFrame, paste(basicDir, "threads-postgresql.png", sep=""))
+                    threads, workload, timeFrame, paste(basicDir, "threads-postgresql.png", sep=""))
 }, error = function(e) print(paste("Problem in threads postgresql", e)))
 
 tryCatch({
   plotThreadTesting(paste(basicDir, "hbase/threads-%1-2.dat", sep = ""),
-                  c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75, 100), workload, timeFrame, paste(basicDir, "threads-hbase.png", sep=""))
+                    threads, workload, timeFrame, paste(basicDir, "threads-hbase.png", sep=""))
 }, error = function(e) print(paste("Problem in hbase postgresql", e)))
 
 tryCatch({
   plotThreadTesting(paste(basicDir, "mongodb/threads-%1-2.dat", sep = ""),
-                  c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75, 100), workload, timeFrame, paste(basicDir, "threads-mongodb.png", sep=""))
+                    threads, workload, timeFrame, paste(basicDir, "threads-mongodb.png", sep=""))
 }, error = function(e) print(paste("Problem in threads mongodb", e)))
 
 ## 
 files <- list()
 nbOfRequests <- list()
 
-#files[[1]] <- paste(basicDir, "hbase/target-%1-2.dat", sep = "")
-#nbOfRequests[[1]] <- c(50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 4000)
+files[[1]] <- paste(basicDir, "hbase/target-%1-2.dat", sep = "")
+nbOfRequests[[1]] <- c(20, 50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000,2000, 2500, 3000)
 
 files[[2]] <- paste(basicDir, "mongodb/target-%1-2.dat", sep = "")
-nbOfRequests[[2]] <- c(50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 4000)
+nbOfRequests[[2]] <- c(20, 50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000,2000)
 
-files[[1]] <- paste(basicDir, "postgresql/target-%1-2.dat", sep = "")
-nbOfRequests[[1]] <- c(50, 100, 150, 200, 250, 300, 400, 500, 600, 700)
+files[[3]] <- paste(basicDir, "postgresql/target-%1-2.dat", sep = "")
+nbOfRequests[[3]] <- c(20, 50, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000)
 
 labelLoad <- c("HBase", "MongoDB", "PostgreSQL")
-labelLoad <- c("PostgreSQL", "MongoDB")
+#labelLoad <- c("PostgreSQL", "MongoDB")
 test <- tryCatch({
 plotLoadTesting(files, labelLoad, nbOfRequests, 
                   timeFrame, queryTypes, basicDir)

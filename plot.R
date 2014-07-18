@@ -107,7 +107,7 @@ plotWithInterrupts = function(fileName, fileNames, plotNames, timeFrame, labels,
       boxplotData["700-800s"] <- rawData[[i]][700:800,label]
       
       png(filename=paste(plotDir, "/boxplot-graph-", plotNames[i], "-" ,label, ".png", sep=""), 
-          width=figureWidth, height=figureHeight, units="px", res=figureRes)
+          width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
       
       boxplot(boxplotData, ylab="Vertraging(ms)", outline = FALSE, names=c("150-250s", "400-500s", "700-800s"))
       dev.off(); 
