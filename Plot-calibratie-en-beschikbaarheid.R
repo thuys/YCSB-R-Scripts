@@ -1,5 +1,5 @@
 source('plot.R')
-basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-17/"
+basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/"
 queryTypes <- c("UPDATE", "READ", "SCAN", "INSERT")
 dir.create(file.path(basicDir, ""), showWarnings = FALSE)
 
@@ -116,11 +116,11 @@ for(run in c(1,2)){
     tryCatch({
       plotWithInterrupts(paste(basicDir, "mongodb/continuous-vmmdb%1.dat", sep = ""),
                          c(
-                           paste("1",type, "-" ,run,sep=""), 
-                           paste("2",type, "-" ,run,sep=""),
-                           paste("3",type, "-" ,run,sep="")
+                           paste("4",type, "-" ,run,sep=""), 
+                           paste("5",type, "-" ,run,sep=""),
+                           paste("6",type, "-" ,run,sep="")
                          ), 
-                         c("Node 1", "Node 2", "Node 3"), 
+                         c("Node 4", "Node 5", "Node 6"), 
                          1000, 
                          queryTypes, 
                          outputDir, 
