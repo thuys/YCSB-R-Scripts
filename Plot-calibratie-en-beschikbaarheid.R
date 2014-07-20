@@ -1,5 +1,5 @@
 source('plot.R')
-basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/"
+basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-19/"
 queryTypes <- c("UPDATE", "READ", "SCAN", "INSERT")
 dir.create(file.path(basicDir, ""), showWarnings = FALSE)
 

@@ -1,6 +1,6 @@
 source('./Consistency-parse.R')
 
-dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/mongodb-consistency/"
+dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-17/mongodb-consistency/"
 dirHbase <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/hbase-consistency/"
 
 writeOpps <- c("safe", "normal", "fsync_safe", "replicas_safe", "majority")
@@ -51,15 +51,24 @@ fileDir <- paste(dir, "Fig/%type%.%extension%", sep="")
 consistencyPlotsMongoForReads(startECDF, endECDF, writeOpps, readOpps, typeOpps, loops, parsed$readerThreads, parsed$writerThreads, fileDir)
 consistencyPlotsMongoForWrites(startECDF, endECDF, writeOpps, readOpps, typeOpps, loops, parsed$readerThreads, parsed$writerThreads, fileDir)
 plotWriteComparison(startECDF, endECDF, writeOpps, readOpps, typeOpps, loops, parsed$readerThreads, parsed$writerThreads, fileDir)
+
+startHBaseECDF <- list()
+endHBaseECDF <- list()
 for(typeOpp in typeOpps){
+  startHBaseECDF[[typeOpp]] <- list()
+  endHBaseECDF[[typeOpp]] <- list()
   for(loop in loopsHbase){
+    startHBaseECDF[[loop]] <- list()
+    endHBaseECDF[[loop]] <- list()
     tryCatch({
       fileName <- paste(dirHbase, typeOpp, "RawData-", loop, ".dat", sep="")
       fileDir <- paste(dirHbase, "Fig/%type%-", typeOpp, "RawData-", loop, ".%extension%", sep="")
       parsed <- consistencyParse(fileName)
       postParsed <- consistencyPostParse(parsed$outputR)
       consistencyPlotNb(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, 3, fileDir)
-      consistencyPlotEachReader(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, fileDir, 2)
+      returnValue <-  consistencyPlotEachReader(postParsed, parsed$outputW, parsed$readerThreads, parsed$writerThreads, fileDir, 2)
+      startHBaseECDF[[typeOpp]][[loop]] <- returnValue[["startL"]]
+      endHBaseECDF[[typeOpp]][[loop]] <- returnValue[["stopL"]]
     }, error = function(e) print(paste("Problem in ", typeOpp, loop, e)))
   }
 }

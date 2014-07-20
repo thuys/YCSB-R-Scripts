@@ -1,4 +1,5 @@
 source('./plot.R')
+library('xtable')
 assign("consistencyEcdf", TRUE, envir = .GlobalEnv)
 assign("consistencyReaders", TRUE, envir = .GlobalEnv)
 consistencyParse <- function(fileName){
@@ -481,8 +482,8 @@ consistencyPlotsMongoForWrites <- function(startECDF, stopECDF, writeOpps, readO
           xMinimum = NA
           xMaximum = NA
           for(writeOpp in writeOpps){
-            xMinimum <- min(xMinimum, quantile(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]],0.01), na.rm = TRUE)
-            xMaximum <- max(xMaximum, quantile(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]],0.97), na.rm = TRUE)
+            xMinimum <- min(xMinimum, quantile(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]],0.01), na.rm = TRUE)
+            xMaximum <- max(xMaximum, quantile(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]],0.97), na.rm = TRUE)
             
           }
           fileNameSub <- gsub("%type%", paste("ECDF-Write-", typeOpp, "-", readOpp, "-", thread, "-", loop, sep=""), gsub("%extension%", "png", exportDir))
@@ -519,8 +520,8 @@ consistencyPlotsMongoForWrites <- function(startECDF, stopECDF, writeOpps, readO
         index <- 0
         for(writeOpp in writeOpps){
           index <- index + 1
-          lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-          lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
+          lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]], col = index, pch = index, do.p = FALSE)
+          lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]], col = index, pch = index, do.p = FALSE)
           
         }
         
@@ -545,7 +546,7 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
           writeStop <- stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][["w"]]
           
           xMinimum = quantile(writeStart,0.01)
-          xMaximum = quantile(writeStop,0.97)          
+          xMaximum = quantile(writeStop,0.90)          
           
           for(readOpp in readOpps){
             xMinimum <- min(xMinimum, quantile(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.01), na.rm = TRUE)
@@ -564,8 +565,8 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
           index <- 2
           for(readOpp in readOpps){
             index <- index + 1
-            lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-            lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
+            lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]], col = index, pch = index, do.p = FALSE)
+            lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]], col = index, pch = index, do.p = FALSE)
             
           }
           
@@ -580,7 +581,7 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
         writeStop <- stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][["w"]]
         
         xMinimum = quantile(writeStart,0.01)
-        xMaximum = quantile(writeStop,0.97)       
+        xMaximum = quantile(writeStop,0.90)       
         for(readOpp in readOpps){
           xMinimum <- min(xMinimum, quantile(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.01), na.rm = TRUE)
           xMaximum <- max(xMaximum, quantile(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.97), na.rm = TRUE)
@@ -598,8 +599,8 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
         index <- 2
         for(readOpp in readOpps){
           index <- index + 1
-          lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-          lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
+          lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]], col = index, pch = index, do.p = FALSE)
+          lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(x=thread)]], col = index, pch = index, do.p = FALSE)
           
         }
         
@@ -707,6 +708,37 @@ plotWriteComparison <- function(startECDF, stopECDF, writeOpps, readOpps, typeOp
   }
 }
 
+getPercentageDone <- function(dataset, readerThreads, startpunt, afstand){
+  resultSet <- 1:length(readerThreads)
+  for(i in 1:length(readerThreads)){
+    resultSet[i] <- dataset[[toString(i)]](startpunt+afstand*i)
+  }
+  return (resultSet)
+}
+
+getPercentageDoneMongoDB <- function(dataset, loop, typeOpp, writeOpps, readOpps, readerThreads, startpunt, afstand, datapunten){
+  resultSet <- matrix(nrow = length(writeOpps), ncol =length(readOpps))
+  rownames(resultSet) <- writeOpps
+  colnames(resultSet) <-readOpps
+  
+  i <- 0
+  for(readOpp in readOpps){
+    i <- i + 1
+    j <- 0
+    for(writeOpp in writeOpps){
+      j <- j + 1
+      tryCatch({
+      output <- getPercentageDone(dataset[[writeOpp]][[readOpp]][[typeOpp]][[toString(loop)]], readerThreads[1:datapunten], startpunt, afstand)
+      resultSet[j, i] <- toString(round(output, digits=2)*100)
+      },error = function(e) TRUE)
+    }
+  }
+  return(resultSet)
+}
+
+getLatexTableForMongoDB <- function(dataset, loop, typeOpp, writeOpps, readOpps, readerThreads, startpunt, afstand, datapunten){
+  return(xtable(getPercentageDoneMongoDB(dataset, loop, typeOpp, writeOpps, readOpps, readerThreads, startpunt, afstand, datapunten)))
+}
 #fileDir <- paste(dir, "Fig/%type%.%extension%", sep="")
 #consistencyPlotsMongoForReads(startECDF, endECDF, writeOpps, readOpps, typeOpps, loops, 1:5, 1, fileDir)
 #consistencyPlotsMongoForWrites(startECDF, endECDF, writeOpps, readOpps, typeOpps, loops, 1:5, 1, fileDir)
