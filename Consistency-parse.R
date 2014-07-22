@@ -399,12 +399,12 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
       startQuery <- ecdf(densityMatrix[,2*numberOfWriters+2*j-1])
       stopQuery <- ecdf(densityMatrix[,2*numberOfWriters+2*j])
       plot(startWQuery, xlim=c(quantile(startQuery,0.01), quantile(stopQuery, 0.99)), ylim = c(0,1), col = 1, pch = 1, 
-           do.p = FALSE, xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+           do.p = FALSE, xlab =tijd,ylab = cumKans, main = NULL)
       lines(stopWQuery, col = 2, pch = 2, do.p = FALSE)
       lines(startQuery, col = 3, pch = 3, do.p = FALSE)
       lines(stopQuery, col = 4, pch = 4, do.p = FALSE)
       
-      legend("bottomright", c("Start schrijven", "Stop schrijven", "Start lezen", "Stop lezen"), col = 1:4, pch=1:4)
+      legend("bottomright", ecdfLegend, col = 1:4, pch=1:4)
       dev.off(); 
       
       minLezen = min(quantile(startQuery,0.01), minLezen, na.rm = TRUE)
@@ -421,7 +421,7 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     fileNameSub <- gsub("%type%", paste("ECDF-plot-Start", sep=""), gsub("%extension%", "png", exportDir))
     png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plot(startWQuery, xlim=c(minLezen, maxLezen), ylim = c(0,1), col = 1, pch = 1,  
-         do.p = FALSE, xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+         do.p = FALSE, xlab =tijd,ylab = cumKans, main = NULL)
     for(j in 1:length(readerNames)){
       lines(ecdf(densityMatrix[,2*numberOfWriters+2*j-1]), col = (j+1), pch = (j+1), do.p = FALSE)
       labelPlot[(1+j)] <- paste("Lezer ", j, sep = "")
@@ -438,7 +438,7 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     fileNameSub <- gsub("%type%", paste("ECDF-plot-Stop", sep=""), gsub("%extension%", "png", exportDir))
     png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
     plot(stopWQuery, xlim=c(minLezen, maxLezen), ylim = c(0,1), col = 1, pch = 1,  
-         do.p = FALSE, xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+         do.p = FALSE, xlab =tijd,ylab = cumKans, main = NULL)
     for(j in 1:length(readerNames)){
       lines(ecdf(densityMatrix[,2*numberOfWriters+2*j]), col = (j+1), pch = (j+1), do.p = FALSE)
       labelPlot[(1+j)] <- paste("Lezer ", j, sep = "")
@@ -462,12 +462,12 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     ecdfStopList[["all"]] <- stopQuery
     
     plot(startWQuery, xlim=c(quantile(startQuery,0.01), quantile(stopQuery, 0.99)), ylim = c(0,1), col = 1, pch = 1, 
-         do.p = FALSE, xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+         do.p = FALSE, xlab = tijd,ylab = cumKans, main = NULL)
     lines(stopWQuery, col = 2, pch = 2, do.p = FALSE)
     lines(startQuery, col = 3, pch = 3, do.p = FALSE)
     lines(stopQuery, col = 4, pch = 4, do.p = FALSE)
     
-    legend("bottomright", c("Start schrijven", "Stop schrijven", "Start lezen", "Stop lezen"), col = 1:4, pch=1:4)
+    legend("bottomright", ecdfLegend, col = 1:4, pch=1:4)
     dev.off(); 
     
     temp <- list(startL = ecdfStartList, stopL = ecdfStopList)
@@ -490,7 +490,7 @@ consistencyPlotsMongoForWrites <- function(startECDF, stopECDF, writeOpps, readO
           png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
           
           plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-               xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+               xlab =tijd,ylab = cumKans, main = NULL)
                
           index <- 0
           for(writeOpp in writeOpps){
@@ -515,7 +515,7 @@ consistencyPlotsMongoForWrites <- function(startECDF, stopECDF, writeOpps, readO
         png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
         
         plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-             xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+             xlab =tijd,ylab = cumKans, main = NULL)
         
         index <- 0
         for(writeOpp in writeOpps){
@@ -557,7 +557,7 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
           png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
           
           plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-               xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+               xlab =tijd,ylab = cumKans, main = NULL)
           
           lines(writeStart, col = 1, pch = 1, do.p = FALSE)
           lines(writeStop, col = 2, pch = 2, do.p = FALSE)
@@ -591,7 +591,7 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
         png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
         
         plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-             xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+             xlab =tijd ,ylab = cumKans, main = NULL)
         
         lines(writeStart, col = 1, pch = 1, do.p = FALSE)
         lines(writeStop, col = 2, pch = 2, do.p = FALSE)
@@ -613,65 +613,6 @@ consistencyPlotsMongoForReads <- function(startECDF, stopECDF, writeOpps, readOp
   }
 }
 
-temp123456 <- function(startECDF, stopECDF, writeOpps, readOpps, typeOpps, loops, readerThreads, writerThreads, exportDir){
-  for(loop in loops){
-    for(typeOpp in typeOpps){
-      for(readOpp in readOpps){
-        for(thread in 1:length(readerThreads)){
-          xMinimum = NA
-          xMaximum = NA
-          for(writeOpp in writeOpps){
-            xMinimum <- min(xMinimum, quantile(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.01), na.rm = TRUE)
-            xMaximum <- max(xMaximum, quantile(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.97), na.rm = TRUE)
-            
-          }
-          fileNameSub <- gsub("%type%", paste("ECDF-Write-", typeOpp, "-", readOpp, "-", thread, "-", loop, sep=""), gsub("%extension%", "png", exportDir))
-          png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
-          
-          plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-               xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
-          
-          index <- 0
-          for(writeOpp in writeOpps){
-            index <- index + 1
-            lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-            lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-            
-          }
-          
-          legend("bottomright", writeOpps, col = 1:index, pch=1:index)
-          dev.off(); 
-        }
-        thread = "all"
-        xMinimum = NA
-        xMaximum = NA
-        for(writeOpp in writeOpps){
-          xMinimum <- min(xMinimum, quantile(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.01), na.rm = TRUE)
-          xMaximum <- max(xMaximum, quantile(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[toString(thread)]],0.97), na.rm = TRUE)
-          
-        }
-        fileNameSub <- gsub("%type%", paste("ECDF-Write-", typeOpp, "-", readOpp, "-", thread, "-", loop, sep=""), gsub("%extension%", "png", exportDir))
-        png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
-        
-        plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-             xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
-        
-        index <- 0
-        for(writeOpp in writeOpps){
-          index <- index + 1
-          lines(startECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-          lines(stopECDF[[writeOpp]][[readOpp]][[typeOpp]][[loop]][[thread]], col = index, pch = index, do.p = FALSE)
-          
-        }
-        
-        legend("bottomright", writeOpps, col = 1:index, pch=1:index)
-        dev.off(); 
-        
-      }
-    }
-    
-  }
-}
 
 plotWriteComparison <- function(startECDF, stopECDF, writeOpps, readOpps, typeOpps, loops, readerThreads, writerThreads, exportDir){
   readLabel <- c("Schrijver start", "Schrijver stop", readOpps)
@@ -690,7 +631,7 @@ plotWriteComparison <- function(startECDF, stopECDF, writeOpps, readOpps, typeOp
       }
       
       plot(c(0), xlim=c(xMinimum, xMaximum), ylim = c(0,1), col = 1, pch = 1, type = "n",
-           xlab ="Tijd(ms)",ylab = "Cumulatieve kans", main = NULL)
+           xlab =tijd,ylab = cumKans, main = NULL)
       
       index <- 0
       for(writeOpp in writeOpps){

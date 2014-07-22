@@ -5,10 +5,20 @@ assign("possibleActions", c("INSERT", "UPDATE", "READ", "CLEANUP", "SCAN"), envi
 assign("globalElements", c("Operations", "AverageLatency(us)", "MinLatency(us)", "MaxLatency(us)", "Return=1", "Return=0", "Return=-1"), envir = .GlobalEnv)
 assign("eventElements", c("ID", "MinLatency(us)", "Has started", "Has Finished", "Exit code"), envir = .GlobalEnv)
 
-assign("figureWidth", 5048, envir = .GlobalEnv)
+assign("figureWidth", 2048, envir = .GlobalEnv)
 assign("figureWidthSquare", 2048, envir = .GlobalEnv)
 assign("figureHeight", 2048, envir = .GlobalEnv)
 assign("figureRes", 350, envir = .GlobalEnv)
+
+assign("vertraging", "Delay(ms)", envir = .GlobalEnv)
+assign("tijd", "Time(s)", envir = .GlobalEnv)
+assign("cumKans", "Empirical distribution",  envir = .GlobalEnv)
+assign("ecdfLegend", c("Start writing", "Stop writing", "Start reading", "Stop reading"),  envir = .GlobalEnv)
+
+#assign("vertraging", "Vertraging(ms)", envir = .GlobalEnv)
+#assign("tijd", "Tijd(s)", envir = .GlobalEnv)
+#assign("cumKans", "Cumulatieve kans",  envir = .GlobalEnv)
+#assign("ecdfLegend", c("Start schrijven", "Stop schrijven", "Start lezen", "Stop lezen"),  envir = .GlobalEnv)
 library(ggplot2) 
 
 source('includes.R')
@@ -86,7 +96,7 @@ parseInput <- function(fileName, timeFrame){
 plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", xlab ="Tijd(s)",ylab = "Vertraging(ms)", 
+  plot(x = 0, y = 0, type="n", xlab =tijd, ,ylab = vertraging, 
        xlim = c(minX, maxX), ylim = c(minY, maxY))
   colNb <- 0
   for(label in labels){
@@ -106,7 +116,7 @@ plotSingleData = function(data, labels, title, minX, maxX, minY, maxY, showPoint
 plotMultipleDataSingleLabel = function(datas, type, labels, title, minX, maxX, minY, maxY, showPoints=TRUE, showAverage=TRUE){
   plot.new()
   heading = paste(title) 
-  plot(x = 0, y = 0, type="n", xlab ="Tijd(s)",ylab = "Vertraging(ms)",
+  plot(x = 0, y = 0, type="n", xlab =tijd,ylab = vertraging,
        xlim = c(minX, maxX), ylim = c(minY, maxY))
 
   for(index in 1:length(datas)){

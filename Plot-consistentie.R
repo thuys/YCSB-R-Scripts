@@ -1,6 +1,6 @@
 source('./Consistency-parse.R')
 
-dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-17/mongodb-consistency/"
+dir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/mongodb-consistency/"
 dirHbase <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/hbase-consistency/"
 
 writeOpps <- c("safe", "normal", "fsync_safe", "replicas_safe", "majority")
