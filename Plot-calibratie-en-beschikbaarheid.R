@@ -1,5 +1,5 @@
 source('plot.R')
-basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-17/"
+basicDir <- "D:/Schooljaar 2013-2014/Thesis/Result-Folder/2014-07-14/"
 queryTypes <- c("UPDATE", "READ", "SCAN", "INSERT")
 dir.create(file.path(basicDir, ""), showWarnings = FALSE)
 
@@ -18,20 +18,22 @@ workload["SCAN"] <- 0.2
 workload["INSERT"] <- 0.2
 
 threads <- c(1,2,3,4,5,7,10,15,20, 30, 40, 50, 75, 100)
-
+threadsM <- c(1,2,5,10, 15, 30, 40, 50, 75, 100)
+threadsH <- c(1,2,3,4,7,10,15,20, 30, 40, 50, 75, 100)
+threadsP <- c(1,2,4,7,10,15,20, 30, 40, 50)
 tryCatch({
   plotThreadTesting(paste(basicDir, "postgresql/threads-%1-2.dat", sep = ""),
-                    threads, workload, timeFrame, paste(basicDir, "threads-postgresql.png", sep=""))
+                    threadsP, workload, timeFrame, paste(basicDir, "threads-postgresql.png", sep=""))
 }, error = function(e) print(paste("Problem in threads postgresql", e)))
 
 tryCatch({
   plotThreadTesting(paste(basicDir, "hbase/threads-%1-2.dat", sep = ""),
-                    threads, workload, timeFrame, paste(basicDir, "threads-hbase.png", sep=""))
+                    threadsH, workload, timeFrame, paste(basicDir, "threads-hbase.png", sep=""))
 }, error = function(e) print(paste("Problem in hbase postgresql", e)))
 
 tryCatch({
   plotThreadTesting(paste(basicDir, "mongodb/threads-%1-2.dat", sep = ""),
-                    threads, workload, timeFrame, paste(basicDir, "threads-mongodb.png", sep=""))
+                    threadsM, workload, timeFrame, paste(basicDir, "threads-mongodb.png", sep=""))
 }, error = function(e) print(paste("Problem in threads mongodb", e)))
 
 ## 

@@ -342,11 +342,11 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
   if(consistencyReaders){
     rowNames <- names(parsedWriter)
     labelPlot <- list()
-    labelPlot[1] <- "Writer Start"
-    labelPlot[2] <- "Writer Delay"
+    labelPlot[1] <- "Schrijver start"
+    labelPlot[2] <- "Schrijver stop"
     for(k in 1:maxRetries){
-      labelPlot[(2*k + 1)] <- paste("Reader Try ", k, " Start", sep = "")
-      labelPlot[(2*k + 2)] <- paste("Reader Try ", k, " Delay", sep = "")
+      labelPlot[(2*k + 1)] <- paste("Lezer Poging ", k, " start", sep = "")
+      labelPlot[(2*k + 2)] <- paste("Lezer Poging ", k, " stop", sep = "")
     }
     labelPlot <- unlist(labelPlot)
     
@@ -357,8 +357,8 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
                  max(plotMatrix[,startIndex:endIndex], na.rm = TRUE) ,na.rm = TRUE)
       fileNameSub <- gsub("%type%", paste("consistency-plot-", names(readerNames)[j], sep=""), gsub("%extension%", "png", exportDir))
       png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
-      plot(x = 0, y = 0, type="n", xlab ="Key number)",ylab = "Time (ms)",
-           ylim = c(0, maxY), xlim = as.numeric(c(min(rowNames), max(rowNames))))
+      plot(x = 0, y = 0, type="n", xlab ="Sleutelnummer",ylab = "Tijd (ms)",
+           ylim = c(0, 80), xlim = as.numeric(c(as.numeric(min(rowNames))+72000000, as.numeric(min(rowNames))+150000000)))
       
       #Plot writers
       lines(x=rowNames, y = plotMatrix[,1],type="l",col = 1, pch = 1)
@@ -390,10 +390,10 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     ecdfStopList[["w"]] <- stopWQuery
     
     minLezen <- quantile(startWQuery,0.01)
-    maxLezen <- quantile(stopWQuery,0.99)
+    maxLezen <- quantile(stopWQuery,0.90)
     for(j in 1:length(readerNames)){
       fileNameSub <- gsub("%type%", paste("ECDF-plot-", names(readerNames)[j], sep=""), gsub("%extension%", "png", exportDir))
-      png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
+      png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
    
       
       startQuery <- ecdf(densityMatrix[,2*numberOfWriters+2*j-1])
@@ -419,7 +419,7 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     labelPlot <- list()
     labelPlot[1] <- "Schrijver"
     fileNameSub <- gsub("%type%", paste("ECDF-plot-Start", sep=""), gsub("%extension%", "png", exportDir))
-    png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
+    png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
     plot(startWQuery, xlim=c(minLezen, maxLezen), ylim = c(0,1), col = 1, pch = 1,  
          do.p = FALSE, xlab =tijd,ylab = cumKans, main = NULL)
     for(j in 1:length(readerNames)){
@@ -436,7 +436,7 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     labelPlot <- list()
     labelPlot[1] <- "Schrijver"
     fileNameSub <- gsub("%type%", paste("ECDF-plot-Stop", sep=""), gsub("%extension%", "png", exportDir))
-    png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
+    png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
     plot(stopWQuery, xlim=c(minLezen, maxLezen), ylim = c(0,1), col = 1, pch = 1,  
          do.p = FALSE, xlab =tijd,ylab = cumKans, main = NULL)
     for(j in 1:length(readerNames)){
@@ -452,7 +452,7 @@ consistencyPlotEachReader <- function(parsedReader, parsedWriter, readerNames, w
     ## ECDF ALL
     
     fileNameSub <- gsub("%type%", paste("ECDF-plot-all", sep=""), gsub("%extension%", "png", exportDir))
-    png(filename=fileNameSub, width=figureWidth, height=figureHeight, units="px", res=figureRes)
+    png(filename=fileNameSub, width=figureWidthSquare, height=figureHeight, units="px", res=figureRes)
     
     
     startQuery <- ecdf(densityMatrixAll[,1])
